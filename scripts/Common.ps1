@@ -74,6 +74,22 @@ function Stop-Provider {
     Get-Process $script:ProviderProcess -ErrorAction SilentlyContinue | Stop-Process -Force
 }
 
+# A broken application manifest keeps the provider from starting, and the widgets stay empty
+# without any message. Started by hand, a healthy provider exits at once with code 0.
+function Assert-ProviderStarts([string]$Directory) {
+    $exe = Join-Path $Directory "$($script:ProviderProcess).exe"
+    try {
+        $process = Start-Process $exe -PassThru -Wait -ErrorAction Stop
+    }
+    catch {
+        throw "The provider does not start: $($_.Exception.Message) Check src\WhichCOM.WidgetProvider\app.manifest."
+    }
+
+    if ($process.ExitCode -ne 0) {
+        throw "The provider exited with code $($process.ExitCode) when started by hand."
+    }
+}
+
 # The widget board starts again by itself when it is opened.
 function Restart-WidgetHost {
     Get-Process 'Widgets', 'WidgetService' -ErrorAction SilentlyContinue | Stop-Process -Force

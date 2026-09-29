@@ -56,6 +56,8 @@ $manifest = Get-ChildItem (Join-Path (Split-Path $project) "bin\$Platform\$Confi
     Select-Object -First 1
 if (-not $manifest) { throw 'AppxManifest.xml was not found in the build output.' }
 
+Assert-ProviderStarts $manifest.DirectoryName
+
 # Version parts are 16 bit numbers: days since 2026-01-01 and half seconds of the day.
 $now = Get-Date
 $days = [int]($now.Date - [datetime]'2026-01-01').TotalDays

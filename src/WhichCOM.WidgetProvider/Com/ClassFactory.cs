@@ -42,8 +42,41 @@ internal sealed class WidgetProviderFactory(IWidgetProvider provider) : IClassFa
         }
 
         instance = MarshalInspectable<IWidgetProvider>.FromManaged(provider);
+        ReportInterfaces(instance);
         return Ok;
     }
+
+    // The widget board asks for these interfaces when it needs them. One that is missing here
+    // explains a feature that silently does nothing, e.g. customization.
+    private static void ReportInterfaces(IntPtr instance)
+    {
+        if (Interlocked.Exchange(ref _reported, 1) == 1)
+        {
+            return;
+        }
+
+        (string Name, Guid Id)[] interfaces =
+        [
+            (nameof(IWidgetProvider2), typeof(IWidgetProvider2).GUID),
+            (nameof(IWidgetProviderAnalytics), typeof(IWidgetProviderAnalytics).GUID),
+        ];
+
+        foreach (var (name, id) in interfaces)
+        {
+            var result = Marshal.QueryInterface(instance, in id, out var pointer);
+            if (pointer != IntPtr.Zero)
+            {
+                Marshal.Release(pointer);
+            }
+
+            if (result != Ok)
+            {
+                Log.Error($"The provider object does not offer {name} (0x{result:X8})");
+            }
+        }
+    }
+
+    private static int _reported;
 
     public int LockServer(bool @lock) => Ok;
 }

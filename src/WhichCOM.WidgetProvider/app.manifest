@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Lets COM carry the newer provider interfaces between the widget board and the provider.
+  Without these entries the widget board cannot reach IWidgetProvider2, and "Customize widget"
+  does nothing.
+
+  The Windows App SDK writes such entries for its other components when the SDK files are part
+  of the application, but skips those of the widgets. They are the entries of
+  runtimes-framework/package.appxfragment in the Microsoft.WindowsAppSDK.Widgets package; check
+  them when that package is updated.
+
+  Keep the form of the entries. An assemblyIdentity element or a proxyStubClsid32 attribute
+  makes the manifest invalid, and the provider does not start at all.
+-->
+<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">
+  <asmv3:file name="Microsoft.Windows.Widgets.dll">
+    <asmv3:comClass clsid="{93022121-B6C9-4A22-90DB-763E24FD99E1}" />
+    <asmv3:comInterfaceProxyStub name="Microsoft.Windows.Widgets.Providers.IWidgetProvider2" iid="{38C3A963-DD93-479D-9276-04BF84EE1816}" />
+    <asmv3:comInterfaceProxyStub name="Microsoft.Windows.Widgets.Providers.IWidgetProviderAnalytics" iid="{661985A5-D187-482D-9EEF-6FDA05D21845}" />
+    <asmv3:comInterfaceProxyStub name="Microsoft.Windows.Widgets.Providers.IWidgetProviderErrors" iid="{90C1B5F0-0D3A-4AC6-ABB7-C97B367B8FCC}" />
+    <asmv3:comInterfaceProxyStub name="Microsoft.Windows.Widgets.Providers.IWidgetProviderMessage" iid="{EA4DC186-9E24-4B35-A5EF-A9F5DF72D6AC}" />
+  </asmv3:file>
+</assembly>

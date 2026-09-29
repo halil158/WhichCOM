@@ -189,6 +189,7 @@ additions, create `%LOCALAPPDATA%\WhichCOM\chips.json` with the same format as
 | | Make sure **Widgets** is enabled in **Settings > Personalization > Taskbar** and that the "Windows Web Experience Pack" is up to date in the Microsoft Store. |
 | The widget is pinned but stays empty or shows an error | Read `%LOCALAPPDATA%\WhichCOM\provider.log`. It records when the provider starts, when widgets are shown and hidden, and every failure. |
 | | Check that the provider runs while the board is open: `Get-Process WhichCOM.WidgetProvider`. |
+| **Customize widget** does nothing | The provider log says `does not offer IWidgetProvider2` when the provider object is the cause. Otherwise the entries in `src/WhichCOM.WidgetProvider/app.manifest` are missing or no longer match the Windows App SDK package. |
 | A size or **Customize widget** is missing in the **…** menu after an update | The widget board keeps the widget definition it saw first. Run `./scripts/Register-DevPackage.ps1 -Reset`, or uninstall and install the package, then pin the widgets again. |
 | A widget disappeared from the board | The log says `DeleteWidget` when a widget was unpinned. Add it again with **Add widgets**. |
 | `Install-Package.ps1` says the signature is not trusted | Run `New-DevCert.ps1 -Trust` in an elevated PowerShell. |
