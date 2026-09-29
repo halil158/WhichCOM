@@ -14,6 +14,12 @@ public sealed class WhichComSettings
     /// <summary>How long a freshly plugged port is marked as new.</summary>
     public int NewBadgeSeconds { get; set; } = 120;
 
+    /// <summary>
+    /// Reads the exact Wi-Fi network name and signal quality. Windows asks for location access
+    /// when this is on. When off, the name of the network profile and signal bars are shown.
+    /// </summary>
+    public bool UseWifiApi { get; set; }
+
     /// <summary>Refresh interval of the widgets while the widget board is visible.</summary>
     public int RefreshSeconds { get; set; } = 4;
 }

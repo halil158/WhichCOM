@@ -1,0 +1,23 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "${networkLine}",
+      "size": "medium",
+      "weight": "bolder",
+      "wrap": true,
+      "maxLines": 2
+    },
+    {
+      "type": "TextBlock",
+      "text": "${audioLine}",
+      "isSubtle": true,
+      "spacing": "small",
+      "wrap": true,
+      "maxLines": 2
+    }
+  ]
+}

@@ -24,7 +24,7 @@ internal sealed class WidgetProvider : IWidgetProvider, IWidgetProvider2
 
     public WidgetProvider()
     {
-        IWidgetKind[] kinds = [new SerialPortsWidget()];
+        IWidgetKind[] kinds = [new SerialPortsWidget(), new SystemStatusWidget()];
         _kinds = kinds.ToDictionary(kind => kind.DefinitionId, StringComparer.Ordinal);
 
         RestoreWidgets();
@@ -76,7 +76,7 @@ internal sealed class WidgetProvider : IWidgetProvider, IWidgetProvider2
             Update(widget, snapshot, force: true);
 
             // Feedback such as "Copied" is shown for a moment, then the card returns to normal.
-            _ = Task.Delay(SerialPortsWidget.CopiedFeedback + TimeSpan.FromMilliseconds(100))
+            _ = Task.Delay(PortActions.CopiedFeedback + TimeSpan.FromMilliseconds(100))
                 .ContinueWith(_ => Update(widget, NewSnapshot(), force: false), TaskScheduler.Default);
         }
         catch (Exception ex)

@@ -30,9 +30,19 @@ public static partial class SerialPortsCard
         CardStrings strings,
         DateTimeOffset now,
         TimeSpan newWindow,
+        string? copiedPort = null) =>
+        BuildData(ports, Capacity(size), strings, now, newWindow, copiedPort);
+
+    /// <param name="capacity">Number of ports the card has room for.</param>
+    public static JsonObject BuildData(
+        IReadOnlyList<SerialPortInfo> ports,
+        int capacity,
+        CardStrings strings,
+        DateTimeOffset now,
+        TimeSpan newWindow,
         string? copiedPort = null)
     {
-        var visible = SelectVisible(ports, Capacity(size));
+        var visible = SelectVisible(ports, capacity);
         var hidden = ports.Count - visible.Count;
         var more = hidden > 0
             ? string.Format(CultureInfo.InvariantCulture, strings.More, hidden)
@@ -61,6 +71,7 @@ public static partial class SerialPortsCard
             ["more"] = more,
             ["strings"] = new JsonObject
             {
+                ["title"] = strings.SerialPorts,
                 ["noDevice"] = strings.NoDevice,
                 ["new"] = strings.New,
                 ["deviceManager"] = strings.DeviceManager,

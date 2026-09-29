@@ -20,6 +20,10 @@
   // Bluetooth serial ports are hidden by default.
   "showBluetoothPorts": false,
 
+  // Exact Wi-Fi network name and signal percentage. Windows asks for location access when this
+  // is on. When off, the name of the network profile and the signal in bars are shown.
+  "useWifiApi": false,
+
   // How long a freshly plugged port is marked as new.
   "newBadgeSeconds": 120,
 

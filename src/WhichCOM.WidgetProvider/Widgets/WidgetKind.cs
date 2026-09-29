@@ -2,6 +2,8 @@ using Microsoft.Windows.Widgets;
 using WhichCOM.Core;
 using WhichCOM.Core.Cards;
 using WhichCOM.Core.Settings;
+using WhichCOM.Core.Status;
+using WhichCOM.WidgetProvider.Status;
 
 namespace WhichCOM.WidgetProvider.Widgets;
 
@@ -40,9 +42,13 @@ internal sealed record WidgetContent(string Template, string Data);
 internal sealed class Snapshot(SettingsStore store, DateTimeOffset now)
 {
     private readonly Lazy<WhichComSettings> _settings = new(store.Load);
+    private Lazy<SystemStatus>? _status;
     private Lazy<IReadOnlyList<SerialPortInfo>>? _ports;
 
     public DateTimeOffset Now { get; } = now;
+
+    public SystemStatus Status =>
+        (_status ??= new Lazy<SystemStatus>(() => SystemStatusReader.Read(Settings.UseWifiApi))).Value;
 
     public WhichComSettings Settings => _settings.Value;
 

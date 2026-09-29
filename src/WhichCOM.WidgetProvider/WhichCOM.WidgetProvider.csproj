@@ -29,7 +29,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ManagedNativeWifi" />
     <PackageReference Include="Microsoft.WindowsAppSDK.Widgets" />
+    <PackageReference Include="NAudio.Wasapi" />
   </ItemGroup>
 
   <ItemGroup>

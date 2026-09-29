@@ -102,6 +102,41 @@
                       </LightMode>
                     </ThemeResources>
                   </Definition>
+                  <Definition
+                    Id="WhichCOM_SystemStatus"
+                    DisplayName="System Status"
+                    Description="Network, internet and default audio devices; the large size adds the serial ports"
+                    AllowMultiple="true">
+                    <Capabilities>
+                      <Capability>
+                        <Size Name="small" />
+                      </Capability>
+                      <Capability>
+                        <Size Name="medium" />
+                      </Capability>
+                      <Capability>
+                        <Size Name="large" />
+                      </Capability>
+                    </Capabilities>
+                    <ThemeResources>
+                      <Icons>
+                        <Icon Path="ProviderAssets\SystemStatus_Icon.png" />
+                      </Icons>
+                      <Screenshots>
+                        <Screenshot Path="ProviderAssets\SystemStatus_Screenshot_Light.png" DisplayAltText="Network connections, internet access and default audio devices" />
+                      </Screenshots>
+                      <DarkMode>
+                        <Screenshots>
+                          <Screenshot Path="ProviderAssets\SystemStatus_Screenshot_Dark.png" DisplayAltText="Network connections, internet access and default audio devices" />
+                        </Screenshots>
+                      </DarkMode>
+                      <LightMode>
+                        <Screenshots>
+                          <Screenshot Path="ProviderAssets\SystemStatus_Screenshot_Light.png" DisplayAltText="Network connections, internet access and default audio devices" />
+                        </Screenshots>
+                      </LightMode>
+                    </ThemeResources>
+                  </Definition>
                 </Definitions>
               </WidgetProvider>
             </uap3:Properties>

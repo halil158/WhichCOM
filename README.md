@@ -7,7 +7,7 @@ CP210x, CH340, FTDI…) on the widget board, along with your Wi-Fi, Ethernet and
 Open the widget board (<kbd>Win</kbd> + <kbd>W</kbd>) and see everything at a glance. It comes with
 `comls`, a small command line tool for scripts.
 
-> 🚧 **Work in progress.** `comls` and the Serial Ports widget work today. The System Status widget is under development.
+> 🚧 **Work in progress.** `comls` and both widgets work today. Nicknames can be set in the settings file; setting them from the widget is under development.
 
 <!-- Screenshot placeholder: docs/images/widgets.png -->
 
@@ -19,7 +19,7 @@ Open the widget board (<kbd>Win</kbd> + <kbd>W</kbd>) and see everything at a gl
 | `comls` command line tool | ✅ Available |
 | Widget provider, MSIX package, certificate script | ✅ Available |
 | "Serial Ports" widget | ✅ Available |
-| "System Status" widget | ⏳ Planned |
+| "System Status" widget | ✅ Available |
 | Nicknames from the widget's customize screen | ⏳ Planned |
 
 ## Features
@@ -29,10 +29,11 @@ Open the widget board (<kbd>Win</kbd> + <kbd>W</kbd>) and see everything at a gl
   - One-click copy of the port name
   - Marks the port you plugged in most recently
   - Nicknames for your boards (e.g. "Sensor board #2")
-- **System Status widget** (small / medium)
+- **System Status widget** (small / medium / large)
   - Wi-Fi (SSID, signal strength, IP address) and Ethernet (link speed, IP address)
   - Internet connectivity
   - Default audio output and input device
+  - The large size also lists the serial ports, so one widget shows everything
 - **`comls` command line tool**
   - Lists serial ports as a table or as JSON
   - Script friendly: `pio run -t upload --upload-port $(comls --latest)`
@@ -195,6 +196,15 @@ The package contains everything it needs, including .NET and the Windows App SDK
 - Device descriptions are shown in the display language of Windows.
 - A widget has a fixed height and cannot scroll. The Serial Ports widget shows up to 4 (small),
   3 (medium) or 5 (large) ports, preferring recently plugged USB devices. `comls` lists all.
+- **Wi-Fi name and signal.** Windows treats the Wi-Fi network name as location data and asks for
+  location access when an application reads it. WhichCOM does not do that by default. It shows
+  the name of the network profile, which Windows creates from the network name, and the signal
+  in bars (steps of 20%). Set `useWifiApi` to `true` in the settings for the exact name and
+  percentage, and allow location access when Windows asks.
+- Virtual network adapters (Hyper-V, VPN, VirtualBox, loopback, Bluetooth) are hidden. The
+  System Status widget shows at most two network adapters, connected ones first.
+- The **…** menu of a widget can open behind a neighbouring widget. The menu belongs to the
+  widget board, not to WhichCOM. Moving the widget to another position helps.
 - The widgets are available in English and Turkish. Set `language` in the settings to override
   the display language of Windows.
 

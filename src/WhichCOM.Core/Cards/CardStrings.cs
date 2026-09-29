@@ -15,6 +15,8 @@ public sealed record CardStrings
 
     public required string Language { get; init; }
 
+    public required string SerialPorts { get; init; }
+
     public required string NoDevice { get; init; }
 
     public required string Copy { get; init; }
@@ -32,12 +34,31 @@ public sealed record CardStrings
     /// <summary>Format string with the number of ports that did not fit on the card.</summary>
     public required string More { get; init; }
 
+    public required string Internet { get; init; }
+
+    public required string NoInternet { get; init; }
+
+    public required string NoNetwork { get; init; }
+
+    public required string Connected { get; init; }
+
+    public required string NotConnected { get; init; }
+
+    public required string AudioOutput { get; init; }
+
+    public required string AudioInput { get; init; }
+
+    public required string NoAudioOutput { get; init; }
+
+    public required string NoAudioInput { get; init; }
+
     public static CardStrings For(string? language) =>
         string.Equals(language?.Trim(), Turkish, StringComparison.OrdinalIgnoreCase) ? TurkishStrings : EnglishStrings;
 
     private static CardStrings EnglishStrings { get; } = new()
     {
         Language = English,
+        SerialPorts = "Serial ports",
         NoDevice = "No device connected",
         Copy = "Copy",
         Copied = "Copied",
@@ -46,11 +67,21 @@ public sealed record CardStrings
         SerialNumber = "S/N",
         DeviceManager = "Device Manager",
         More = "+{0} more",
+        Internet = "Internet access",
+        NoInternet = "No internet",
+        NoNetwork = "No network",
+        Connected = "Connected",
+        NotConnected = "Not connected",
+        AudioOutput = "Output",
+        AudioInput = "Input",
+        NoAudioOutput = "No output device",
+        NoAudioInput = "No input device",
     };
 
     private static CardStrings TurkishStrings { get; } = new()
     {
         Language = Turkish,
+        SerialPorts = "Seri portlar",
         NoDevice = "Bağlı cihaz yok",
         Copy = "Kopyala",
         Copied = "Kopyalandı",
@@ -59,5 +90,14 @@ public sealed record CardStrings
         SerialNumber = "Seri no",
         DeviceManager = "Aygıt Yöneticisi",
         More = "+{0} port daha",
+        Internet = "İnternet erişimi var",
+        NoInternet = "İnternet yok",
+        NoNetwork = "Ağ bağlantısı yok",
+        Connected = "Bağlı",
+        NotConnected = "Bağlı değil",
+        AudioOutput = "Çıkış",
+        AudioInput = "Giriş",
+        NoAudioOutput = "Çıkış cihazı yok",
+        NoAudioInput = "Giriş cihazı yok",
     };
 }
