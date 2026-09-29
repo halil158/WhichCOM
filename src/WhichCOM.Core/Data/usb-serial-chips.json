@@ -1,0 +1,28 @@
+{
+  "chips": [
+    { "vid": "10C4", "pid": "EA60", "label": "CP210x", "vendor": "Silicon Labs", "tags": [ "cp210x", "cp2102", "cp2104" ] },
+    { "vid": "10C4", "pid": "EA70", "label": "CP2105", "vendor": "Silicon Labs", "tags": [ "cp210x" ] },
+    { "vid": "10C4", "pid": "EA71", "label": "CP2108", "vendor": "Silicon Labs", "tags": [ "cp210x" ] },
+
+    { "vid": "1A86", "pid": "7523", "label": "CH340", "vendor": "WCH", "tags": [ "ch34x" ] },
+    { "vid": "1A86", "pid": "5523", "label": "CH341", "vendor": "WCH", "tags": [ "ch34x" ] },
+    { "vid": "1A86", "pid": "55D3", "label": "CH343", "vendor": "WCH", "tags": [ "ch34x" ] },
+    { "vid": "1A86", "pid": "55D4", "label": "CH9102", "vendor": "WCH", "tags": [ "ch910x" ] },
+
+    { "vid": "0403", "pid": "6001", "label": "FTDI FT232R", "vendor": "FTDI", "tags": [ "ftdi" ] },
+    { "vid": "0403", "pid": "6010", "label": "FTDI FT2232", "vendor": "FTDI", "tags": [ "ftdi" ] },
+    { "vid": "0403", "pid": "6011", "label": "FTDI FT4232", "vendor": "FTDI", "tags": [ "ftdi" ] },
+    { "vid": "0403", "pid": "6014", "label": "FTDI FT232H", "vendor": "FTDI", "tags": [ "ftdi" ] },
+    { "vid": "0403", "pid": "6015", "label": "FTDI FT-X", "vendor": "FTDI", "tags": [ "ftdi" ] },
+
+    { "vid": "303A", "pid": "1001", "label": "ESP32 native USB", "vendor": "Espressif", "tags": [ "esp32", "esp32-s3", "esp32-c3" ] },
+    { "vid": "303A", "pid": "*", "label": "Espressif", "vendor": "Espressif", "tags": [ "esp32" ] },
+
+    { "vid": "2341", "pid": "*", "label": "Arduino", "vendor": "Arduino", "tags": [ "arduino" ] },
+    { "vid": "2A03", "pid": "*", "label": "Arduino", "vendor": "Arduino", "tags": [ "arduino" ] },
+
+    { "vid": "067B", "pid": "2303", "label": "PL2303", "vendor": "Prolific", "tags": [ "pl2303" ] },
+    { "vid": "0483", "pid": "5740", "label": "STM32 Virtual COM", "vendor": "STMicroelectronics", "tags": [ "stm32" ] },
+    { "vid": "2E8A", "pid": "*", "label": "Raspberry Pi Pico", "vendor": "Raspberry Pi", "tags": [ "pico", "rp2040" ] }
+  ]
+}

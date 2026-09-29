@@ -1,0 +1,60 @@
+# gitleaks configuration for WhichCOM.
+# The default rules find secrets (keys, tokens, passwords). The rules below additionally find
+# personal data that must not end up in this public repository.
+
+title = "WhichCOM"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Build output and tool folders"
+paths = [
+    '''(^|/)(bin|obj|\.vs|\.git|AppPackages|BundleArtifacts|TestResults)/''',
+]
+
+[[rules]]
+id = "windows-user-profile-path"
+description = "Windows user profile path (contains a user name)"
+regex = '''(?i)\b[a-z]:\\{1,2}users\\{1,2}[^\\/\s"'<>|*?:%$]+'''
+keywords = ["users"]
+
+    [[rules.allowlists]]
+    description = "Well-known accounts and placeholders"
+    regexTarget = "match"
+    regexes = [
+        '''(?i)users\\{1,2}(public|default|username|example|runneradmin)$''',
+    ]
+
+[[rules]]
+id = "email-address"
+description = "E-mail address"
+regex = '''[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}'''
+keywords = ["@"]
+
+    [[rules.allowlists]]
+    description = "Addresses that do not belong to a person"
+    regexTarget = "match"
+    regexes = [
+        '''(?i)@(example\.(com|org|net)|users\.noreply\.github\.com)$''',
+        '''(?i)^(git@github\.com|noreply@.*)$''',
+    ]
+
+[[rules]]
+id = "mac-address"
+description = "MAC address (also used as serial number by some USB devices)"
+regex = '''\b[0-9A-Fa-f]{2}([:-][0-9A-Fa-f]{2}){5}\b'''
+
+    [[rules.allowlists]]
+    description = "Made-up addresses used in tests and documentation"
+    regexTarget = "match"
+    regexes = [
+        '''(?i)^AA[:-]BB[:-]CC[:-]DD[:-]EE[:-]FF$''',
+        '''(?i)^00[:-]00[:-]5E[:-]00[:-]53[:-][0-9A-F]{2}$''',
+        '''^(00[:-]){5}00$''',
+    ]
+
+[[rules]]
+id = "private-ipv4-address"
+description = "Private IPv4 address (use 192.0.2.x in examples)"
+regex = '''\b(10\.(25[0-5]|2[0-4]\d|1?\d?\d)|192\.168|172\.(1[6-9]|2\d|3[01]))\.(25[0-5]|2[0-4]\d|1?\d?\d)\.(25[0-5]|2[0-4]\d|1?\d?\d)\b'''

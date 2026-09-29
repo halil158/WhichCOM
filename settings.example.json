@@ -1,0 +1,25 @@
+{
+  // Copy this file to %LOCALAPPDATA%\WhichCOM\settings.json and edit it.
+  // All values below are examples.
+
+  "aliases": [
+    // A device with a serial number: identify it by the serial number.
+    { "serial": "EXAMPLE0001", "name": "Sensor board #2" },
+
+    // Cheap adapters often share a serial number such as "0001"; add vidPid to tell them apart.
+    { "serial": "0001", "vidPid": "10C4:EA60", "name": "Gateway" },
+
+    // A device without a serial number: identify it by VID:PID and the USB socket it is plugged into.
+    // 'comls --json' prints the locationPath of every port.
+    { "vidPid": "1A86:7523", "location": "PCIROOT(0)#PCI(1400)#USBROOT(0)#USB(3)", "name": "Bench CH340" }
+  ],
+
+  // Bluetooth serial ports are hidden by default.
+  "showBluetoothPorts": false,
+
+  // How long a freshly plugged port is marked as new.
+  "newBadgeSeconds": 120,
+
+  // Refresh interval while the widget board is open.
+  "refreshSeconds": 4
+}

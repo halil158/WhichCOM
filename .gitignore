@@ -427,3 +427,42 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+## WhichCOM
+
+# Certificates and keys. The signing certificate is created on each developer's computer
+# with scripts/New-DevCert.ps1 and must never be committed.
+*.pfx
+*.p12
+*.pem
+*.key
+*.pvk
+*.snk
+*.cer
+*.crt
+*.der
+
+# Package output
+*.msixbundle
+*.msixupload
+*.appx
+*.appxbundle
+*.appxupload
+AppPackages/
+BundleArtifacts/
+
+# User specific files. Commit *.example.json files instead.
+settings.json
+chips.json
+*.local.json
+!settings.example.json
+
+# Logs and scratch files
+*.log
+logs/
+*.tmp
+*.tmp.*
+
+# Tool folders
+.claude/
+gitleaks-report.*

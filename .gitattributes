@@ -1,0 +1,20 @@
+* text=auto
+
+# Shell scripts break with CRLF line endings.
+.githooks/* text eol=lf
+*.sh        text eol=lf
+
+*.cs     text diff=csharp
+*.ps1    text
+*.json   text
+*.md     text
+*.yml    text
+*.toml   text
+*.props  text
+*.csproj text
+*.slnx   text
+*.appxmanifest text
+
+*.png binary
+*.ico binary
+*.gif binary
