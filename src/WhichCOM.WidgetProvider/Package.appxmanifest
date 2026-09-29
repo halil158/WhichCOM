@@ -68,10 +68,10 @@
                 </Activation>
                 <Definitions>
                   <Definition
-                    Id="WhichCOM_Hello"
-                    DisplayName="WhichCOM Hello"
-                    Description="Test widget that shows the provider is installed"
-                    AllowMultiple="false">
+                    Id="WhichCOM_SerialPorts"
+                    DisplayName="Serial Ports"
+                    Description="Connected serial (COM) ports with chip type and nickname"
+                    AllowMultiple="true">
                     <Capabilities>
                       <Capability>
                         <Size Name="small" />

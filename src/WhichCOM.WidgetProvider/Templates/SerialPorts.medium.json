@@ -1,0 +1,94 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "ColumnSet",
+      "$data": "${ports}",
+      "spacing": "medium",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "RichTextBlock",
+              "inlines": [
+                {
+                  "type": "TextRun",
+                  "text": "${port}",
+                  "size": "large",
+                  "weight": "bolder"
+                },
+                {
+                  "type": "TextRun",
+                  "$when": "${isNew}",
+                  "text": "  ${$root.strings.new}",
+                  "size": "small",
+                  "weight": "bolder",
+                  "color": "accent"
+                }
+              ]
+            },
+            {
+              "type": "TextBlock",
+              "text": "${label}",
+              "isSubtle": true,
+              "spacing": "none",
+              "wrap": false
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "auto",
+          "verticalContentAlignment": "center",
+          "items": [
+            {
+              "type": "ActionSet",
+              "actions": [
+                {
+                  "type": "Action.Execute",
+                  "title": "${copyTitle}",
+                  "verb": "copy",
+                  "data": {
+                    "port": "${port}"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "$when": "${hasMore}",
+      "text": "${more}",
+      "size": "small",
+      "isSubtle": true,
+      "spacing": "medium"
+    },
+    {
+      "type": "TextBlock",
+      "$when": "${isEmpty}",
+      "text": "${strings.noDevice}",
+      "size": "medium",
+      "isSubtle": true,
+      "wrap": true
+    },
+    {
+      "type": "ActionSet",
+      "$when": "${isEmpty}",
+      "spacing": "medium",
+      "actions": [
+        {
+          "type": "Action.Execute",
+          "title": "${strings.deviceManager}",
+          "verb": "deviceManager"
+        }
+      ]
+    }
+  ]
+}

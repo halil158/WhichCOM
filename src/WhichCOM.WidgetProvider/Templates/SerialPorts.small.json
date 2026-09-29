@@ -1,0 +1,32 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "$when": "${hasPorts}",
+      "text": "${summary}",
+      "size": "extraLarge",
+      "weight": "bolder",
+      "wrap": true,
+      "maxLines": 2
+    },
+    {
+      "type": "TextBlock",
+      "$when": "${hasPorts}",
+      "text": "${subtitle}",
+      "isSubtle": true,
+      "spacing": "small",
+      "wrap": false
+    },
+    {
+      "type": "TextBlock",
+      "$when": "${isEmpty}",
+      "text": "${strings.noDevice}",
+      "size": "medium",
+      "isSubtle": true,
+      "wrap": true
+    }
+  ]
+}

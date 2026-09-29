@@ -14,6 +14,9 @@
     { "vidPid": "1A86:7523", "location": "PCIROOT(0)#PCI(1400)#USBROOT(0)#USB(3)", "name": "Bench CH340" }
   ],
 
+  // Language of the widgets: "auto" follows the display language of Windows, or use "en" / "tr".
+  "language": "auto",
+
   // Bluetooth serial ports are hidden by default.
   "showBluetoothPorts": false,
 

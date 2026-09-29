@@ -1,21 +1,9 @@
 using System.Collections.Concurrent;
-using System.Globalization;
-using System.Text.Json.Nodes;
 using Microsoft.Windows.Widgets.Providers;
+using WhichCOM.Core.Settings;
+using WhichCOM.WidgetProvider.Widgets;
 
 namespace WhichCOM.WidgetProvider;
-
-/// <summary>State of one widget the user has pinned to the widget board.</summary>
-internal sealed class WidgetInstance(string id, string definitionId)
-{
-    public string Id { get; } = id;
-
-    public string DefinitionId { get; } = definitionId;
-
-    public bool IsActive { get; set; }
-
-    public bool InCustomization { get; set; }
-}
 
 /// <summary>
 /// COM object the widget host talks to. Data is only collected between Activate and Deactivate,
@@ -23,17 +11,22 @@ internal sealed class WidgetInstance(string id, string definitionId)
 /// </summary>
 internal sealed class WidgetProvider : IWidgetProvider, IWidgetProvider2
 {
-    public const string HelloDefinitionId = "WhichCOM_Hello";
+    private const int MinRefreshSeconds = 2;
+    private const int MaxRefreshSeconds = 60;
 
-    private static readonly TimeSpan RefreshInterval = TimeSpan.FromSeconds(4);
-
+    private readonly Dictionary<string, IWidgetKind> _kinds;
     private readonly ConcurrentDictionary<string, WidgetInstance> _widgets = new(StringComparer.Ordinal);
+    private readonly SettingsStore _settings = new();
     private readonly ManualResetEventSlim _noWidgetsLeft = new(false);
     private readonly Lock _timerGate = new();
     private Timer? _timer;
+    private int _refreshing;
 
     public WidgetProvider()
     {
+        IWidgetKind[] kinds = [new SerialPortsWidget()];
+        _kinds = kinds.ToDictionary(kind => kind.DefinitionId, StringComparer.Ordinal);
+
         RestoreWidgets();
     }
 
@@ -44,18 +37,16 @@ internal sealed class WidgetProvider : IWidgetProvider, IWidgetProvider2
 
     public void CreateWidget(WidgetContext widgetContext)
     {
-        var widget = new WidgetInstance(widgetContext.Id, widgetContext.DefinitionId);
-        _widgets[widget.Id] = widget;
-        _noWidgetsLeft.Reset();
+        var widget = Track(widgetContext);
+        Log.Info($"CreateWidget {widget.DefinitionId} {widget.Size}");
 
-        Log.Info($"CreateWidget {widget.DefinitionId} {widget.Id}");
-        Update(widget);
+        Update(widget, NewSnapshot(), force: true);
     }
 
     public void DeleteWidget(string widgetId, string customState)
     {
         _widgets.TryRemove(widgetId, out _);
-        Log.Info($"DeleteWidget {widgetId}");
+        Log.Info("DeleteWidget");
 
         SyncTimer();
         if (_widgets.IsEmpty)
@@ -66,34 +57,54 @@ internal sealed class WidgetProvider : IWidgetProvider, IWidgetProvider2
 
     public void OnActionInvoked(WidgetActionInvokedArgs actionInvokedArgs)
     {
-        Log.Info($"OnActionInvoked {actionInvokedArgs.Verb}");
+        var widget = Track(actionInvokedArgs.WidgetContext);
+        var verb = actionInvokedArgs.Verb;
+
+        try
+        {
+            if (!_kinds.TryGetValue(widget.DefinitionId, out var kind))
+            {
+                return;
+            }
+
+            var snapshot = NewSnapshot();
+            if (!kind.HandleAction(widget, verb, actionInvokedArgs.Data, snapshot))
+            {
+                return;
+            }
+
+            Update(widget, snapshot, force: true);
+
+            // Feedback such as "Copied" is shown for a moment, then the card returns to normal.
+            _ = Task.Delay(SerialPortsWidget.CopiedFeedback + TimeSpan.FromMilliseconds(100))
+                .ContinueWith(_ => Update(widget, NewSnapshot(), force: false), TaskScheduler.Default);
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Action '{verb}' failed", ex);
+        }
     }
 
     public void OnWidgetContextChanged(WidgetContextChangedArgs contextChangedArgs)
     {
-        if (_widgets.TryGetValue(contextChangedArgs.WidgetContext.Id, out var widget))
-        {
-            Update(widget);
-        }
+        var widget = Track(contextChangedArgs.WidgetContext);
+        Log.Info($"ContextChanged {widget.DefinitionId} {widget.Size}");
+
+        Update(widget, NewSnapshot(), force: true);
     }
 
     public void OnCustomizationRequested(WidgetCustomizationRequestedArgs customizationInvokedArgs)
     {
-        Log.Info($"OnCustomizationRequested {customizationInvokedArgs.WidgetContext.Id}");
+        Log.Info("CustomizationRequested");
     }
 
     public void Activate(WidgetContext widgetContext)
     {
-        // The host may activate a widget it created while this process was not running.
-        var widget = _widgets.GetOrAdd(
-            widgetContext.Id,
-            id => new WidgetInstance(id, widgetContext.DefinitionId));
-
+        var widget = Track(widgetContext);
         widget.IsActive = true;
-        _noWidgetsLeft.Reset();
-        Log.Info($"Activate {widget.DefinitionId} {widget.Id}");
+        Log.Info($"Activate {widget.DefinitionId} {widget.Size}");
 
-        Update(widget);
+        Update(widget, NewSnapshot(), force: true);
         SyncTimer();
     }
 
@@ -102,10 +113,21 @@ internal sealed class WidgetProvider : IWidgetProvider, IWidgetProvider2
         if (_widgets.TryGetValue(widgetId, out var widget))
         {
             widget.IsActive = false;
+            Log.Info($"Deactivate {widget.DefinitionId}");
         }
 
-        Log.Info($"Deactivate {widgetId}");
         SyncTimer();
+    }
+
+    private Snapshot NewSnapshot() => new(_settings, DateTimeOffset.Now);
+
+    // The host may call for a widget it created while this process was not running.
+    private WidgetInstance Track(WidgetContext context)
+    {
+        var widget = _widgets.GetOrAdd(context.Id, id => new WidgetInstance(id, context.DefinitionId));
+        widget.Size = context.Size;
+        _noWidgetsLeft.Reset();
+        return widget;
     }
 
     private void RestoreWidgets()
@@ -115,8 +137,7 @@ internal sealed class WidgetProvider : IWidgetProvider, IWidgetProvider2
             // The list is null, not empty, when no widget is pinned.
             foreach (var info in WidgetManager.GetDefault().GetWidgetInfos() ?? [])
             {
-                var context = info.WidgetContext;
-                _widgets[context.Id] = new WidgetInstance(context.Id, context.DefinitionId);
+                Track(info.WidgetContext);
             }
 
             Log.Info($"Restored {_widgets.Count} widget(s)");
@@ -136,8 +157,10 @@ internal sealed class WidgetProvider : IWidgetProvider, IWidgetProvider2
 
             if (anyActive && _timer is null)
             {
-                _timer = new Timer(_ => RefreshActive(), null, RefreshInterval, RefreshInterval);
-                Log.Info("Refresh started");
+                var seconds = Math.Clamp(_settings.Load().RefreshSeconds, MinRefreshSeconds, MaxRefreshSeconds);
+                var interval = TimeSpan.FromSeconds(seconds);
+                _timer = new Timer(_ => RefreshActive(), null, interval, interval);
+                Log.Info($"Refresh started ({seconds} s)");
             }
             else if (!anyActive && _timer is not null)
             {
@@ -150,35 +173,57 @@ internal sealed class WidgetProvider : IWidgetProvider, IWidgetProvider2
 
     private void RefreshActive()
     {
-        foreach (var widget in _widgets.Values.Where(widget => widget.IsActive))
+        // Skip a tick when the previous one is still reading devices.
+        if (Interlocked.Exchange(ref _refreshing, 1) == 1)
         {
-            Update(widget);
+            return;
+        }
+
+        try
+        {
+            var snapshot = NewSnapshot();
+            foreach (var widget in _widgets.Values.Where(widget => widget.IsActive))
+            {
+                Update(widget, snapshot, force: false);
+            }
+        }
+        finally
+        {
+            Volatile.Write(ref _refreshing, 0);
         }
     }
 
-    private static void Update(WidgetInstance widget)
+    private void Update(WidgetInstance widget, Snapshot snapshot, bool force)
     {
+        if (!_kinds.TryGetValue(widget.DefinitionId, out var kind))
+        {
+            return;
+        }
+
         try
         {
-            var data = new JsonObject
+            lock (widget.Gate)
             {
-                ["title"] = "Hello from WhichCOM",
-                ["message"] = "The widget provider is installed and running.",
-                ["updated"] = DateTime.Now.ToString("HH:mm:ss", CultureInfo.InvariantCulture),
-            };
+                var content = kind.Render(widget, snapshot);
+                if (!force && content == widget.LastSent)
+                {
+                    return;
+                }
 
-            var options = new WidgetUpdateRequestOptions(widget.Id)
-            {
-                Template = TemplateStore.Get("Hello"),
-                Data = data.ToJsonString(),
-                CustomState = string.Empty,
-            };
+                var options = new WidgetUpdateRequestOptions(widget.Id)
+                {
+                    Template = content.Template,
+                    Data = content.Data,
+                    CustomState = string.Empty,
+                };
 
-            WidgetManager.GetDefault().UpdateWidget(options);
+                WidgetManager.GetDefault().UpdateWidget(options);
+                widget.LastSent = content;
+            }
         }
         catch (Exception ex)
         {
-            Log.Error($"Update failed for {widget.Id}", ex);
+            Log.Error($"Update failed for {widget.DefinitionId}", ex);
         }
     }
 }

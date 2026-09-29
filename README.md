@@ -7,7 +7,7 @@ CP210x, CH340, FTDI…) on the widget board, along with your Wi-Fi, Ethernet and
 Open the widget board (<kbd>Win</kbd> + <kbd>W</kbd>) and see everything at a glance. It comes with
 `comls`, a small command line tool for scripts.
 
-> 🚧 **Work in progress.** The `comls` tool works today. The widgets are under development.
+> 🚧 **Work in progress.** `comls` and the Serial Ports widget work today. The System Status widget is under development.
 
 <!-- Screenshot placeholder: docs/images/widgets.png -->
 
@@ -17,8 +17,8 @@ Open the widget board (<kbd>Win</kbd> + <kbd>W</kbd>) and see everything at a gl
 | --- | --- |
 | Shared port library (`WhichCOM.Core`) | ✅ Available |
 | `comls` command line tool | ✅ Available |
-| Widget provider, MSIX package, certificate script | ✅ Available (test widget) |
-| "Serial Ports" widget | ⏳ Planned |
+| Widget provider, MSIX package, certificate script | ✅ Available |
+| "Serial Ports" widget | ✅ Available |
 | "System Status" widget | ⏳ Planned |
 | Nicknames from the widget's customize screen | ⏳ Planned |
 
@@ -120,8 +120,6 @@ additions, create `%LOCALAPPDATA%\WhichCOM\chips.json` with the same format as
 
 ## Install the widgets
 
-> The package currently contains a test widget ("WhichCOM Hello"). The real widgets follow.
-
 All scripts are in the [scripts](scripts) folder and run in PowerShell 7 (`pwsh`). Turn on
 Developer Mode first: **Settings > System > For developers > Developer Mode**.
 
@@ -195,6 +193,10 @@ The package contains everything it needs, including .NET and the Windows App SDK
 - Many low-cost USB serial adapters have no serial number, or all share the same one. Their
   nickname then belongs to the USB socket, not to the adapter.
 - Device descriptions are shown in the display language of Windows.
+- A widget has a fixed height and cannot scroll. The Serial Ports widget shows up to 4 (small),
+  3 (medium) or 5 (large) ports, preferring recently plugged USB devices. `comls` lists all.
+- The widgets are available in English and Turkish. Set `language` in the settings to override
+  the display language of Windows.
 
 ## Releases
 

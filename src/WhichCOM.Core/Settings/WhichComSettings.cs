@@ -8,6 +8,9 @@ public sealed class WhichComSettings
     /// <summary>Bluetooth serial ports are always present and rarely the device being looked for.</summary>
     public bool ShowBluetoothPorts { get; set; }
 
+    /// <summary>Language of the widgets: "auto" (display language of Windows), "en" or "tr".</summary>
+    public string Language { get; set; } = "auto";
+
     /// <summary>How long a freshly plugged port is marked as new.</summary>
     public int NewBadgeSeconds { get; set; } = 120;
 
