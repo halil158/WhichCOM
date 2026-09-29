@@ -52,6 +52,18 @@ public sealed record CardStrings
 
     public required string NoAudioInput { get; init; }
 
+    public required string Nicknames { get; init; }
+
+    public required string NicknameHint { get; init; }
+
+    public required string NicknamePlaceholder { get; init; }
+
+    public required string NoDeviceForNickname { get; init; }
+
+    public required string Save { get; init; }
+
+    public required string Cancel { get; init; }
+
     public static CardStrings For(string? language) =>
         string.Equals(language?.Trim(), Turkish, StringComparison.OrdinalIgnoreCase) ? TurkishStrings : EnglishStrings;
 
@@ -76,6 +88,12 @@ public sealed record CardStrings
         AudioInput = "Input",
         NoAudioOutput = "No output device",
         NoAudioInput = "No input device",
+        Nicknames = "Nicknames",
+        NicknameHint = "A nickname stays with the device, also when its port number changes.",
+        NicknamePlaceholder = "Nickname",
+        NoDeviceForNickname = "Connect a device to give it a nickname.",
+        Save = "Save",
+        Cancel = "Cancel",
     };
 
     private static CardStrings TurkishStrings { get; } = new()
@@ -99,5 +117,11 @@ public sealed record CardStrings
         AudioInput = "Giriş",
         NoAudioOutput = "Çıkış cihazı yok",
         NoAudioInput = "Giriş cihazı yok",
+        Nicknames = "Takma adlar",
+        NicknameHint = "Takma ad cihaza bağlıdır; port numarası değişse de kalır.",
+        NicknamePlaceholder = "Takma ad",
+        NoDeviceForNickname = "Takma ad vermek için bir cihaz bağlayın.",
+        Save = "Kaydet",
+        Cancel = "Vazgeç",
     };
 }

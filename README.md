@@ -7,20 +7,7 @@ CP210x, CH340, FTDI…) on the widget board, along with your Wi-Fi, Ethernet and
 Open the widget board (<kbd>Win</kbd> + <kbd>W</kbd>) and see everything at a glance. It comes with
 `comls`, a small command line tool for scripts.
 
-> 🚧 **Work in progress.** `comls` and both widgets work today. Nicknames can be set in the settings file; setting them from the widget is under development.
-
 <!-- Screenshot placeholder: docs/images/widgets.png -->
-
-## Status
-
-| Part | State |
-| --- | --- |
-| Shared port library (`WhichCOM.Core`) | ✅ Available |
-| `comls` command line tool | ✅ Available |
-| Widget provider, MSIX package, certificate script | ✅ Available |
-| "Serial Ports" widget | ✅ Available |
-| "System Status" widget | ✅ Available |
-| Nicknames from the widget's customize screen | ⏳ Planned |
 
 ## Features
 
@@ -30,7 +17,7 @@ Open the widget board (<kbd>Win</kbd> + <kbd>W</kbd>) and see everything at a gl
   - Marks the port you plugged in most recently
   - Nicknames for your boards (e.g. "Sensor board #2")
 - **System Status widget** (small / medium / large)
-  - Wi-Fi (SSID, signal strength, IP address) and Ethernet (link speed, IP address)
+  - Wi-Fi (network name, signal strength, IP address) and Ethernet (link speed, IP address)
   - Internet connectivity
   - Default audio output and input device
   - The large size also lists the serial ports, so one widget shows everything
@@ -39,13 +26,16 @@ Open the widget board (<kbd>Win</kbd> + <kbd>W</kbd>) and see everything at a gl
   - Script friendly: `pio run -t upload --upload-port $(comls --latest)`
 
 The widgets only collect data while the widget board is visible. When the board is closed,
-WhichCOM does no work.
+WhichCOM does no work. It sends no data anywhere.
 
 ## Requirements
 
 - Windows 11
-- [.NET 10 SDK](https://dotnet.microsoft.com/download) to build from source
-- Developer Mode enabled, to install the widget package (not needed for `comls`)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download) and PowerShell 7 (`pwsh`) to build from source
+- Developer Mode, to install the widget package:
+  **Settings > System > For developers > Developer Mode**
+
+Visual Studio is not required.
 
 ## Build
 
@@ -56,11 +46,64 @@ dotnet build WhichCOM.slnx --configuration Release
 dotnet test WhichCOM.slnx --configuration Release
 ```
 
-Visual Studio is not required.
+## Install
+
+All scripts are in the [scripts](scripts) folder.
+
+### Quick: register without a certificate
+
+```powershell
+./scripts/Register-DevPackage.ps1
+```
+
+This builds the package and registers it for your user. Nothing is signed and no certificate is
+needed. Run it again after every change; pinned widgets stay on the board.
+
+### Full: signed package
+
+1. Create your own signing certificate. It is stored in your Windows certificate store; the
+   private key cannot be exported and is never written to a file.
+
+   ```powershell
+   ./scripts/New-DevCert.ps1
+   ```
+
+2. Let Windows trust the certificate. This needs an **elevated** PowerShell and is done once.
+   An elevated PowerShell starts in the system folder, so use the full path of the script;
+   step 1 prints the exact command.
+
+   ```powershell
+   pwsh -File "<path to the repository>\scripts\New-DevCert.ps1" -Trust
+   ```
+
+3. Build, sign and install.
+
+   ```powershell
+   ./scripts/Build-Package.ps1
+   ./scripts/Install-Package.ps1
+   ```
+
+The package contains everything it needs, including .NET and the Windows App SDK files.
+
+### Add a widget to the board
+
+1. Open the widget board with <kbd>Win</kbd> + <kbd>W</kbd>.
+2. Choose **Add widgets** (the **+** button).
+3. Select **WhichCOM** in the list, pick a widget and choose **Pin**.
+4. Use the **…** menu of the widget to change its size, to customize or to unpin it.
+
+### Uninstall
+
+```powershell
+./scripts/Uninstall-Package.ps1                      # keeps your settings
+./scripts/Uninstall-Package.ps1 -RemoveSettings      # also deletes your nicknames
+./scripts/Uninstall-Package.ps1 -RemoveCertificate   # also deletes the certificate
+```
 
 ## comls
 
-Build a single `comls.exe` and put it in a folder that is on your `PATH`:
+Installing the package puts `comls` on the `PATH` of every terminal. To use `comls` without the
+widgets, build a single `comls.exe` and copy it to a folder that is on your `PATH`:
 
 ```powershell
 dotnet publish src/WhichCOM.Cli --configuration Release --runtime win-x64 --self-contained false -p:PublishSingleFile=true --output publish/comls
@@ -103,11 +146,7 @@ esptool.py --port $(comls --latest --match esp32) chip_id
 comls --json | ConvertFrom-Json | Where-Object chipLabel -like 'FTDI*'
 ```
 
-## Settings and nicknames
-
-Settings are shared by the widgets and `comls`. They are stored in
-`%LOCALAPPDATA%\WhichCOM\settings.json`. The file is optional; copy
-[settings.example.json](settings.example.json) to get started.
+## Nicknames
 
 A nickname belongs to a device, not to a port number:
 
@@ -115,77 +154,46 @@ A nickname belongs to a device, not to a port number:
 - A device without a serial number is identified by its VID:PID together with the USB socket it is
   plugged into. `comls --json` prints this value as `locationPath`.
 
+To set nicknames, open the **…** menu of a widget and choose **Customize widget**. The card lists
+the connected devices; type a nickname and choose **Save**. An empty nickname removes it. The
+card has room for 1 (small), 2 (medium) or 5 (large) devices.
+
+Nicknames can also be written into the settings file by hand.
+
+## Settings
+
+Settings are shared by the widgets and `comls`. They are stored in
+`%LOCALAPPDATA%\WhichCOM\settings.json`. The file is optional; see
+[settings.example.json](settings.example.json) for every setting. Changes are picked up at the
+next refresh.
+
+| Setting | Default | Meaning |
+| --- | --- | --- |
+| `aliases` | empty | Nicknames |
+| `language` | `"auto"` | `"auto"` follows the display language of Windows; `"en"` or `"tr"` |
+| `showBluetoothPorts` | `false` | Also list Bluetooth serial ports |
+| `useWifiApi` | `false` | Exact Wi-Fi name and signal percentage; Windows asks for location access |
+| `newBadgeSeconds` | `120` | How long a freshly plugged port is marked as new |
+| `refreshSeconds` | `4` | Refresh interval while the widget board is open |
+
 To add chips that WhichCOM does not know yet, see [CONTRIBUTING.md](CONTRIBUTING.md). For private
 additions, create `%LOCALAPPDATA%\WhichCOM\chips.json` with the same format as
 [usb-serial-chips.json](src/WhichCOM.Core/Data/usb-serial-chips.json).
 
-## Install the widgets
-
-All scripts are in the [scripts](scripts) folder and run in PowerShell 7 (`pwsh`). Turn on
-Developer Mode first: **Settings > System > For developers > Developer Mode**.
-
-### Quick: register without a certificate
-
-```powershell
-./scripts/Register-DevPackage.ps1
-```
-
-This builds the provider and registers it for your user. Nothing is signed and no certificate is
-needed. Run it again after every change; pinned widgets stay on the board.
-
-### Full: signed package
-
-1. Create your own signing certificate. It is stored in your Windows certificate store; the
-   private key cannot be exported and is never written to a file.
-
-   ```powershell
-   ./scripts/New-DevCert.ps1
-   ```
-
-2. Let Windows trust the certificate. This needs an **elevated** PowerShell and is done once.
-   An elevated PowerShell starts in the system folder, so use the full path of the script;
-   step 1 prints the exact command.
-
-   ```powershell
-   pwsh -File "<path to the repository>\scripts\New-DevCert.ps1" -Trust
-   ```
-
-3. Build, sign and install.
-
-   ```powershell
-   ./scripts/Build-Package.ps1
-   ./scripts/Install-Package.ps1
-   ```
-
-The package contains everything it needs, including .NET and the Windows App SDK files.
-
-### Add a widget to the board
-
-1. Open the widget board with <kbd>Win</kbd> + <kbd>W</kbd>.
-2. Choose **Add widgets** (the **+** button).
-3. Select **WhichCOM** in the list, pick a widget and choose **Pin**.
-4. Use the **…** menu of the widget to change its size or to unpin it.
-
-### Uninstall
-
-```powershell
-./scripts/Uninstall-Package.ps1                      # keeps your settings
-./scripts/Uninstall-Package.ps1 -RemoveSettings      # also deletes your nicknames
-./scripts/Uninstall-Package.ps1 -RemoveCertificate   # also deletes the certificate
-```
-
-### Troubleshooting
+## Troubleshooting
 
 | Problem | What to check |
 | --- | --- |
 | WhichCOM is missing in **Add widgets** | Close the board and open it again; the list is cached. If it is still missing, sign out and in again, or end the `Widgets` and `WidgetService` processes in Task Manager. |
 | | `Get-AppxPackage Yigisoft.WhichCOM` must list the package. If not, the installation failed. |
 | | Make sure **Widgets** is enabled in **Settings > Personalization > Taskbar** and that the "Windows Web Experience Pack" is up to date in the Microsoft Store. |
-| The widget is pinned but stays empty or shows an error | Read `%LOCALAPPDATA%\WhichCOM\provider.log`. It records when the provider starts and every failure. |
+| The widget is pinned but stays empty or shows an error | Read `%LOCALAPPDATA%\WhichCOM\provider.log`. It records when the provider starts, when widgets are shown and hidden, and every failure. |
 | | Check that the provider runs while the board is open: `Get-Process WhichCOM.WidgetProvider`. |
-| `Install-Package.ps1` says the signature is not trusted | Run `./scripts/New-DevCert.ps1 -Trust` in an elevated PowerShell. |
+| A widget disappeared from the board | The log says `DeleteWidget` when a widget was unpinned. Add it again with **Add widgets**. |
+| `Install-Package.ps1` says the signature is not trusted | Run `New-DevCert.ps1 -Trust` in an elevated PowerShell. |
 | Installation fails with `0x80073CFB` or "a package with the same identity is already installed" | Run `./scripts/Uninstall-Package.ps1`, then install again. |
 | The build fails with `PRI210 ... File move failed` | The widget host has a file of an older build open. Rename `resources.pri` in the build output folder, or end the `WidgetService` process, and build again. |
+| `comls` is not found after installing the package | Open a new terminal. `%LOCALAPPDATA%\Microsoft\WindowsApps` must be on the `PATH`. |
 
 ## Known limitations
 
@@ -205,17 +213,20 @@ The package contains everything it needs, including .NET and the Windows App SDK
   System Status widget shows at most two network adapters, connected ones first.
 - The **…** menu of a widget can open behind a neighbouring widget. The menu belongs to the
   widget board, not to WhichCOM. Moving the widget to another position helps.
-- The widgets are available in English and Turkish. Set `language` in the settings to override
-  the display language of Windows.
+- After the customization card was shown, the **…** menu of the widget may stop responding until
+  the board is opened again. This is a known problem of the widget board.
+- The widgets are available in English and Turkish. The names in the **Add widgets** list are
+  English only.
+- The package is not in the Microsoft Store. It has to be signed with a certificate that the
+  computer trusts, or registered in Developer Mode.
 
 ## Releases
 
 There are no prebuilt packages yet. A release will need:
 
-- `comls.exe` for x64 and ARM64
-- A signed MSIX package of the widget provider, together with the public certificate (`.cer`)
-  or signed with a certificate that Windows already trusts
-- The Windows App SDK runtime packages the MSIX depends on
+- A signed MSIX package for x64 and ARM64. `comls` is part of the package.
+- The public certificate (`.cer`) the package is signed with, unless Windows already trusts it
+- `comls.exe` for x64 and ARM64, for use without the widgets
 - Installation notes and checksums
 
 Signed releases are not automated. The private key of a signing certificate never belongs in
@@ -240,14 +251,32 @@ WhichCOM, bilgisayara USB ile bağladığınız ESP32, Arduino gibi kartların h
 düştüğünü Aygıt Yöneticisi'ne girmeden, Windows 11 widget panosundan (<kbd>Win</kbd> + <kbd>W</kbd>)
 görmenizi sağlar. Ayrıca Wi-Fi, Ethernet ve ses cihazı durumunu gösterir.
 
-Proje geliştirme aşamasındadır. Şu anda `comls` komut satırı aracı kullanılabilir:
+**Widget'lar**
+
+- **Serial Ports:** bağlı COM portları, çip tipi, takma ad ve Kopyala düğmesi
+- **System Status:** ağ, internet ve varsayılan ses cihazları; büyük boyutta COM portları da görünür
+
+Widget'lar yalnızca pano açıkken veri toplar.
+
+**Kurulum**
+
+1. Geliştirici Modu'nu açın: Ayarlar > Sistem > Geliştiriciler için.
+2. `./scripts/Register-DevPackage.ps1` komutunu çalıştırın.
+3. Panoyu açın, **Widget ekle** ile WhichCOM widget'larını sabitleyin.
+
+İmzalı paket kurmak için yukarıdaki "Full: signed package" adımlarını izleyin.
+
+**comls**
 
 - `comls`: seri portları tablo olarak listeler
 - `comls --json`: aynı listeyi JSON olarak verir
 - `comls --latest`: en son takılan portun adını yazar
 - `comls --match esp32`: takma ada veya çip tipine göre filtreler
 
-Takma adlar `%LOCALAPPDATA%\WhichCOM\settings.json` dosyasında tutulur; örnek için
-[settings.example.json](settings.example.json) dosyasına bakın.
+**Takma adlar**
+
+Widget'ın **…** menüsünden **Widget'ı özelleştir** seçeneğiyle verilir. Takma ad cihaza bağlıdır;
+port numarası değişse de kalır. Ayarlar `%LOCALAPPDATA%\WhichCOM\settings.json` dosyasında
+tutulur; örnek için [settings.example.json](settings.example.json) dosyasına bakın.
 
 Yigisoft tarafından geliştirilmiştir.

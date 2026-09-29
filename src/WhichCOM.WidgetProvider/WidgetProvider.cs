@@ -1,5 +1,7 @@
 using System.Collections.Concurrent;
+using System.Text.Json.Nodes;
 using Microsoft.Windows.Widgets.Providers;
+using WhichCOM.Core.Cards;
 using WhichCOM.Core.Settings;
 using WhichCOM.WidgetProvider.Widgets;
 
@@ -9,7 +11,7 @@ namespace WhichCOM.WidgetProvider;
 /// COM object the widget host talks to. Data is only collected between Activate and Deactivate,
 /// that is while the widget board is visible.
 /// </summary>
-internal sealed class WidgetProvider : IWidgetProvider, IWidgetProvider2
+internal sealed class WidgetProvider : IWidgetProvider, IWidgetProvider2, IWidgetProviderAnalytics
 {
     private const int MinRefreshSeconds = 2;
     private const int MaxRefreshSeconds = 60;
@@ -62,6 +64,17 @@ internal sealed class WidgetProvider : IWidgetProvider, IWidgetProvider2
 
         try
         {
+            if (verb is NicknameCard.SaveVerb or NicknameCard.CancelVerb)
+            {
+                if (verb == NicknameCard.SaveVerb)
+                {
+                    SaveNicknames(actionInvokedArgs.Data);
+                }
+
+                LeaveCustomization(widget);
+                return;
+            }
+
             if (!_kinds.TryGetValue(widget.DefinitionId, out var kind))
             {
                 return;
@@ -95,7 +108,27 @@ internal sealed class WidgetProvider : IWidgetProvider, IWidgetProvider2
 
     public void OnCustomizationRequested(WidgetCustomizationRequestedArgs customizationInvokedArgs)
     {
-        Log.Info("CustomizationRequested");
+        var widget = Track(customizationInvokedArgs.WidgetContext);
+        widget.InCustomization = true;
+        Log.Info($"CustomizationRequested {widget.DefinitionId}");
+
+        Update(widget, NewSnapshot(), force: true);
+    }
+
+    // The host reports here when the user leaves the customization card without using its buttons.
+    public void OnAnalyticsInfoReported(WidgetAnalyticsInfoReportedArgs args)
+    {
+        try
+        {
+            var kind = JsonNode.Parse(args.AnalyticsJson)?["interactionKind"]?.GetValue<string>();
+            if (kind == NicknameCard.CancelVerb && _widgets.TryGetValue(args.WidgetContext.Id, out var widget))
+            {
+                LeaveCustomization(widget);
+            }
+        }
+        catch (Exception ex) when (ex is System.Text.Json.JsonException or InvalidOperationException or FormatException)
+        {
+        }
     }
 
     public void Activate(WidgetContext widgetContext)
@@ -113,6 +146,7 @@ internal sealed class WidgetProvider : IWidgetProvider, IWidgetProvider2
         if (_widgets.TryGetValue(widgetId, out var widget))
         {
             widget.IsActive = false;
+            widget.InCustomization = false;
             Log.Info($"Deactivate {widget.DefinitionId}");
         }
 
@@ -120,6 +154,41 @@ internal sealed class WidgetProvider : IWidgetProvider, IWidgetProvider2
     }
 
     private Snapshot NewSnapshot() => new(_settings, DateTimeOffset.Now);
+
+    private void SaveNicknames(string actionData)
+    {
+        var nicknames = NicknameCard.ReadNicknames(actionData);
+        if (nicknames.Count == 0)
+        {
+            return;
+        }
+
+        var snapshot = NewSnapshot();
+        var changed = NicknameCard.Apply(snapshot.Settings, snapshot.Ports, nicknames);
+        if (changed > 0)
+        {
+            _settings.Save(snapshot.Settings);
+        }
+
+        Log.Info($"Nicknames saved ({changed} changed)");
+    }
+
+    private void LeaveCustomization(WidgetInstance widget)
+    {
+        if (!widget.InCustomization)
+        {
+            return;
+        }
+
+        widget.InCustomization = false;
+
+        // Nicknames are shown by every widget that lists ports.
+        var snapshot = NewSnapshot();
+        foreach (var other in _widgets.Values.Where(other => other.IsActive || other == widget))
+        {
+            Update(other, snapshot, force: other == widget);
+        }
+    }
 
     // The host may call for a widget it created while this process was not running.
     private WidgetInstance Track(WidgetContext context)
@@ -182,7 +251,8 @@ internal sealed class WidgetProvider : IWidgetProvider, IWidgetProvider2
         try
         {
             var snapshot = NewSnapshot();
-            foreach (var widget in _widgets.Values.Where(widget => widget.IsActive))
+            // A card the user is typing in must not be replaced.
+            foreach (var widget in _widgets.Values.Where(widget => widget.IsActive && !widget.InCustomization))
             {
                 Update(widget, snapshot, force: false);
             }
@@ -204,7 +274,11 @@ internal sealed class WidgetProvider : IWidgetProvider, IWidgetProvider2
         {
             lock (widget.Gate)
             {
-                var content = kind.Render(widget, snapshot);
+                var content = widget.InCustomization
+                    ? new WidgetContent(
+                        TemplateStore.Get("Nicknames"),
+                        NicknameCard.BuildData(snapshot.Ports, widget.CardSize, snapshot.Strings).ToJsonString())
+                    : kind.Render(widget, snapshot);
                 if (!force && content == widget.LastSent)
                 {
                     return;

@@ -18,6 +18,16 @@
     <Version>0.1.0</Version>
   </PropertyGroup>
 
+  <!--
+    The widget package contains a self-contained build of comls. Its intermediate files are kept
+    outside the project folder so that they do not disturb the normal build of the project.
+  -->
+  <PropertyGroup Condition="'$(ComlsForPackage)' == 'true' and '$(MSBuildProjectName)' == 'WhichCOM.Cli'">
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)artifacts\obj\comls\</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)artifacts\bin\comls\</BaseOutputPath>
+    <SelfContained>true</SelfContained>
+  </PropertyGroup>
+
   <!-- Keep local checkout paths (which may contain a user name) out of binaries and PDBs. -->
   <PropertyGroup>
     <Deterministic>true</Deterministic>

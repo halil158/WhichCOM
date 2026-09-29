@@ -3,10 +3,12 @@
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
+  xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
+  xmlns:desktop4="http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
   xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
   xmlns:desktop6="http://schemas.microsoft.com/appx/manifest/desktop/windows10/6"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-  IgnorableNamespaces="uap uap3 com desktop6 rescap">
+  IgnorableNamespaces="uap uap3 uap5 com desktop4 desktop6 rescap">
 
   <Identity
     Name="Yigisoft.WhichCOM"
@@ -40,6 +42,7 @@
         AppListEntry="none" />
 
       <Extensions>
+
         <!-- The widget host starts the provider through this COM class. -->
         <com:Extension Category="windows.comServer">
           <com:ComServer>
@@ -71,7 +74,8 @@
                     Id="WhichCOM_SerialPorts"
                     DisplayName="Serial Ports"
                     Description="Connected serial (COM) ports with chip type and nickname"
-                    AllowMultiple="true">
+                    AllowMultiple="true"
+                    IsCustomizable="true">
                     <Capabilities>
                       <Capability>
                         <Size Name="small" />
@@ -106,7 +110,8 @@
                     Id="WhichCOM_SystemStatus"
                     DisplayName="System Status"
                     Description="Network, internet and default audio devices; the large size adds the serial ports"
-                    AllowMultiple="true">
+                    AllowMultiple="true"
+                    IsCustomizable="true">
                     <Capabilities>
                       <Capability>
                         <Size Name="small" />
@@ -142,6 +147,29 @@
             </uap3:Properties>
           </uap3:AppExtension>
         </uap3:Extension>
+      </Extensions>
+    </Application>
+
+    <!-- The comls command line tool. The execution alias makes it available in every terminal. -->
+    <Application
+      Id="Comls"
+      Executable="comls.exe"
+      EntryPoint="Windows.FullTrustApplication"
+      desktop4:SupportsMultipleInstances="true">
+      <uap:VisualElements
+        DisplayName="comls"
+        Description="Lists the serial (COM) ports of this computer"
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png"
+        AppListEntry="none" />
+
+      <Extensions>
+        <uap5:Extension Category="windows.appExecutionAlias" Executable="comls.exe" EntryPoint="Windows.FullTrustApplication">
+          <uap5:AppExecutionAlias desktop4:Subsystem="console">
+            <uap5:ExecutionAlias Alias="comls.exe" />
+          </uap5:AppExecutionAlias>
+        </uap5:Extension>
       </Extensions>
     </Application>
   </Applications>

@@ -1,0 +1,52 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "${title}",
+      "weight": "bolder",
+      "size": "medium"
+    },
+    {
+      "type": "TextBlock",
+      "$when": "${hasDevices}",
+      "text": "${hint}",
+      "size": "small",
+      "isSubtle": true,
+      "wrap": true,
+      "spacing": "none"
+    },
+    {
+      "type": "Input.Text",
+      "$data": "${devices}",
+      "id": "${inputId}",
+      "label": "${label}",
+      "value": "${nickname}",
+      "placeholder": "${$root.placeholder}",
+      "maxLength": 40,
+      "spacing": "small"
+    },
+    {
+      "type": "TextBlock",
+      "$when": "${isEmpty}",
+      "text": "${noDevices}",
+      "isSubtle": true,
+      "wrap": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Execute",
+      "$when": "${hasDevices}",
+      "title": "${save}",
+      "verb": "saveNicknames"
+    },
+    {
+      "type": "Action.Execute",
+      "title": "${cancel}",
+      "verb": "exitCustomization"
+    }
+  ]
+}

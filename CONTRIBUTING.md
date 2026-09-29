@@ -80,10 +80,39 @@ If gitleaks reports a false positive, prefer changing the value to one from the 
 that is not possible, extend the allow list of the rule in [.gitleaks.toml](.gitleaks.toml) and
 explain why in the pull request.
 
+## Project layout
+
+| Folder | Content |
+| --- | --- |
+| `src/WhichCOM.Core` | Port reading, device ID parsing, chip table, settings, card data. No dependency on the widget API |
+| `src/WhichCOM.Cli` | `comls` |
+| `src/WhichCOM.WidgetProvider` | COM server for the widget board, card templates, package manifest, images |
+| `tests/WhichCOM.Core.Tests` | Unit tests |
+| `scripts` | Certificate, package, install and scan scripts |
+
+## Change a widget
+
+A widget is drawn from two parts: a template and data.
+
+- Templates are Adaptive Cards in `src/WhichCOM.WidgetProvider/Templates`, one per widget size.
+  Use theme colors (`accent`, `good`, `attention`, `isSubtle`) and never fixed colors, so that
+  the cards work in light and dark mode.
+- Data is built in `src/WhichCOM.Core/Cards`. Texts are in `CardStrings.cs`, in English and
+  Turkish; add new texts to both.
+
+The tests expand every template with real card data. After a change run `dotnet test`, then
+`./scripts/Register-DevPackage.ps1` and look at the widget in all its sizes.
+
+Widgets cannot scroll. When you add rows, check the capacity constants in the card builders.
+
 ## Code
 
 - Comments and commit messages are in English.
 - Code that reads ports or parses device IDs belongs in `WhichCOM.Core` and needs unit tests.
   The widget provider and `comls` share it.
+- The provider must do no work while the widget board is closed. Read data only between
+  `Activate` and `Deactivate`.
+- Do not call APIs that make Windows ask the user for a permission, unless the user opted in
+  through a setting.
 - Package versions are pinned in [Directory.Packages.props](Directory.Packages.props).
 - The build treats warnings as errors.

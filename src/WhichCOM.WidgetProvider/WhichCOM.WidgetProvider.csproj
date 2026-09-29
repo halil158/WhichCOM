@@ -45,4 +45,26 @@
     <EmbeddedResource Include="Templates\*.json" LogicalName="WhichCOM.WidgetProvider.Templates.%(Filename)%(Extension)" />
   </ItemGroup>
 
+  <!--
+    comls is part of the package; an execution alias in the manifest puts it on the PATH.
+    It is built for the same runtime as the provider and uses the .NET files of the package.
+  -->
+  <Target Name="IncludeComls" BeforeTargets="AssignTargetPaths" Condition="'$(IncludeComls)' != 'false'">
+    <PropertyGroup>
+      <_ComlsProject>$(MSBuildProjectDirectory)\..\WhichCOM.Cli\WhichCOM.Cli.csproj</_ComlsProject>
+      <_ComlsPublishDir>$(MSBuildProjectDirectory)\$(BaseIntermediateOutputPath)comls\$(Configuration)\$(RuntimeIdentifier)\</_ComlsPublishDir>
+      <_ComlsProperties>ComlsForPackage=true;Configuration=$(Configuration);Platform=AnyCPU;RuntimeIdentifier=$(RuntimeIdentifier);PublishDir=$(_ComlsPublishDir)</_ComlsProperties>
+    </PropertyGroup>
+
+    <MSBuild Projects="$(_ComlsProject)" Targets="Restore" Properties="$(_ComlsProperties);_ComlsStep=Restore" />
+    <MSBuild Projects="$(_ComlsProject)" Targets="Publish" Properties="$(_ComlsProperties)" />
+
+    <ItemGroup>
+      <Content Include="$(_ComlsPublishDir)comls.exe" Link="comls.exe" CopyToOutputDirectory="PreserveNewest" />
+      <Content Include="$(_ComlsPublishDir)comls.dll" Link="comls.dll" CopyToOutputDirectory="PreserveNewest" />
+      <Content Include="$(_ComlsPublishDir)comls.deps.json" Link="comls.deps.json" CopyToOutputDirectory="PreserveNewest" />
+      <Content Include="$(_ComlsPublishDir)comls.runtimeconfig.json" Link="comls.runtimeconfig.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+
 </Project>

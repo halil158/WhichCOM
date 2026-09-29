@@ -20,6 +20,9 @@ internal sealed class WidgetInstance(string id, string definitionId)
 
     public bool IsActive { get; set; }
 
+    /// <summary>True while the widget shows the card for editing nicknames.</summary>
+    public bool InCustomization { get; set; }
+
     /// <summary>Port whose copy button shows a confirmation until <see cref="CopiedUntil"/>.</summary>
     public string? CopiedPort { get; set; }
 
