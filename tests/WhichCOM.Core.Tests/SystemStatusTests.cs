@@ -286,7 +286,7 @@ public class SystemStatusTests
                 SystemStatusCard.InputIcon, "Microphone (Test Audio)", "Input",
                 SerialPortsCard.PortIcon, "COM3", "CH340", "Copied",
                 SerialPortsCard.PortIcon, "COM7", "Sensor board", "new",
-                SerialPortsCard.DeviceManagerIcon, "Device Manager", "Show all devices", "›",
+                SerialPortsCard.DeviceManagerIcon, "Device Manager", "Show all devices",
             ],
             texts);
 
@@ -307,9 +307,9 @@ public class SystemStatusTests
         Assert.Equal(
             [
                 SerialPortsCard.PortIcon, "No device connected",
-                SerialPortsCard.DeviceManagerIcon, "Device Manager", "Show all devices", "›",
+                SerialPortsCard.DeviceManagerIcon, "Device Manager", "Show all devices",
             ],
-            texts.TakeLast(6));
+            texts.TakeLast(5));
     }
 
     [Fact]
@@ -321,8 +321,8 @@ public class SystemStatusTests
 
         Assert.Equal(SystemStatusCard.LargeCardPortCapacity, data["serial"]!["ports"]!.AsArray().Count);
         var texts = Texts(ExpandLarge(data));
-        Assert.Equal("+4 more", texts[^5]);
-        Assert.Equal("Device Manager", texts[^3]);
+        Assert.Equal("+4 more", texts[^4]);
+        Assert.Equal("Device Manager", texts[^2]);
     }
 
     private static JsonNode ExpandLarge(JsonObject data)

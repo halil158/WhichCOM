@@ -86,7 +86,7 @@ public class CardTemplateTests
     {
         var card = ExpandSerialPorts(size, []);
 
-        Assert.Equal(["No device connected", "Device Manager", "Show all devices", "›"], Texts(card));
+        Assert.Equal(["No device connected", "Device Manager", "Show all devices"], Texts(card));
         Assert.Single(Actions(card, SerialPortsCard.DeviceManagerVerb));
         Assert.Empty(Actions(card, SerialPortsCard.CopyVerb));
     }
@@ -155,7 +155,7 @@ public class CardTemplateTests
         Assert.Contains("USB-SERIAL CH340 · 1A86:7523", texts);
         Assert.Contains("ESP32 native USB · 303A:1001", texts);
         Assert.Contains("S/N AA:BB:CC:DD:EE:FF", texts);
-        Assert.Equal(["Device Manager", "Show all devices", "›"], texts.TakeLast(3));
+        Assert.Equal(["Device Manager", "Show all devices"], texts.TakeLast(2));
 
         Assert.Single(Actions(card, SerialPortsCard.DeviceManagerVerb));
         Assert.Null(card["actions"]);

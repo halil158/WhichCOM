@@ -99,18 +99,6 @@
               "wrap": false
             }
           ]
-        },
-        {
-          "type": "Column",
-          "width": "auto",
-          "verticalContentAlignment": "center",
-          "items": [
-            {
-              "type": "TextBlock",
-              "text": "›",
-              "isSubtle": true
-            }
-          ]
         }
       ]
     }
