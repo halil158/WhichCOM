@@ -4,19 +4,26 @@
   "version": "1.5",
   "body": [
     {
+      "type": "TextBlock",
+      "text": "${internet}",
+      "color": "${internetColor}",
+      "size": "small",
+      "weight": "bolder"
+    },
+    {
       "type": "ColumnSet",
       "$data": "${links}",
       "spacing": "small",
       "columns": [
         {
           "type": "Column",
-          "width": "auto",
+          "width": "28px",
           "verticalContentAlignment": "center",
           "items": [
             {
               "type": "TextBlock",
               "text": "${icon}",
-              "size": "large"
+              "size": "medium"
             }
           ]
         },
@@ -44,158 +51,215 @@
       ]
     },
     {
-      "type": "TextBlock",
-      "text": "${internet}",
-      "color": "${internetColor}",
-      "size": "small",
-      "weight": "bolder",
-      "spacing": "small"
-    },
-    {
-      "type": "ColumnSet",
-      "$data": "${audio}",
-      "spacing": "small",
-      "columns": [
-        {
-          "type": "Column",
-          "width": "auto",
-          "verticalContentAlignment": "center",
-          "items": [
-            {
-              "type": "TextBlock",
-              "text": "${icon}",
-              "size": "large"
-            }
-          ]
-        },
-        {
-          "type": "Column",
-          "width": "stretch",
-          "items": [
-            {
-              "type": "TextBlock",
-              "text": "${title}",
-              "weight": "bolder",
-              "wrap": false
-            },
-            {
-              "type": "TextBlock",
-              "$when": "${hasDetail}",
-              "text": "${detail}",
-              "size": "small",
-              "isSubtle": true,
-              "spacing": "none",
-              "wrap": false
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "TextBlock",
-      "text": "${serial.strings.title}",
-      "size": "small",
-      "weight": "bolder",
-      "isSubtle": true,
+      "type": "Container",
       "separator": true,
-      "spacing": "medium"
-    },
-    {
-      "type": "ColumnSet",
-      "$data": "${serial.ports}",
-      "spacing": "small",
-      "selectAction": {
-        "type": "Action.Execute",
-        "verb": "copy",
-        "tooltip": "${copyTitle}",
-        "data": {
-          "port": "${port}"
-        }
-      },
-      "columns": [
+      "spacing": "medium",
+      "items": [
         {
-          "type": "Column",
-          "width": "stretch",
-          "items": [
+          "type": "ColumnSet",
+          "$data": "${audio}",
+          "spacing": "small",
+          "columns": [
             {
-              "type": "RichTextBlock",
-              "inlines": [
+              "type": "Column",
+              "width": "28px",
+              "verticalContentAlignment": "center",
+              "items": [
                 {
-                  "type": "TextRun",
-                  "text": "${port}",
-                  "size": "large",
-                  "weight": "bolder"
-                },
-                {
-                  "type": "TextRun",
-                  "$when": "${isNew}",
-                  "text": "  ${$root.serial.strings.new}",
-                  "size": "small",
-                  "weight": "bolder",
-                  "color": "accent"
+                  "type": "TextBlock",
+                  "text": "${icon}",
+                  "size": "medium"
                 }
               ]
             },
             {
-              "type": "TextBlock",
-              "text": "${label}",
-              "isSubtle": true,
-              "spacing": "none",
-              "wrap": false
-            }
-          ]
-        },
-        {
-          "type": "Column",
-          "width": "auto",
-          "verticalContentAlignment": "center",
-          "items": [
-            {
-              "type": "TextBlock",
-              "$when": "${isCopied}",
-              "text": "${copiedText}",
-              "color": "good",
-              "size": "small",
-              "weight": "bolder"
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${title}",
+                  "weight": "bolder",
+                  "wrap": false
+                },
+                {
+                  "type": "TextBlock",
+                  "$when": "${hasDetail}",
+                  "text": "${detail}",
+                  "size": "small",
+                  "isSubtle": true,
+                  "spacing": "none",
+                  "wrap": false
+                }
+              ]
             }
           ]
         }
       ]
     },
     {
-      "type": "TextBlock",
-      "$when": "${serial.hasMore}",
-      "text": "${serial.more}",
-      "size": "small",
-      "isSubtle": true,
-      "spacing": "small"
-    },
-    {
-      "type": "TextBlock",
-      "$when": "${serial.isEmpty}",
-      "text": "${serial.strings.noDevice}",
-      "isSubtle": true,
-      "spacing": "small",
-      "wrap": true
-    },
-    {
       "type": "Container",
+      "separator": true,
       "spacing": "medium",
-      "selectAction": {
-        "type": "Action.Execute",
-        "verb": "deviceManager",
-        "tooltip": "${serial.strings.deviceManager}"
-      },
       "items": [
         {
+          "type": "ColumnSet",
+          "$data": "${serial.ports}",
+          "spacing": "small",
+          "selectAction": {
+            "type": "Action.Execute",
+            "verb": "copy",
+            "tooltip": "${copyTitle}",
+            "data": {
+              "port": "${port}"
+            }
+          },
+          "columns": [
+            {
+              "type": "Column",
+              "width": "28px",
+              "verticalContentAlignment": "center",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${icon}",
+                  "size": "medium"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${port}",
+                  "weight": "bolder",
+                  "wrap": false
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "${label}",
+                  "size": "small",
+                  "isSubtle": true,
+                  "spacing": "none",
+                  "wrap": false
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "verticalContentAlignment": "center",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "$when": "${hasStatus}",
+                  "text": "${status}",
+                  "color": "${statusColor}",
+                  "size": "small",
+                  "weight": "bolder"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "ColumnSet",
+          "$when": "${serial.isEmpty}",
+          "spacing": "small",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "28px",
+              "verticalContentAlignment": "center",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${serial.strings.portIcon}",
+                  "size": "medium"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "verticalContentAlignment": "center",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${serial.strings.noDevice}",
+                  "isSubtle": true,
+                  "wrap": true
+                }
+              ]
+            }
+          ]
+        },
+        {
           "type": "TextBlock",
-          "text": "${serial.strings.deviceManager}",
-          "color": "accent",
+          "$when": "${serial.hasMore}",
+          "text": "${serial.more}",
           "size": "small",
-          "weight": "bolder"
+          "isSubtle": true,
+          "spacing": "small"
+        },
+        {
+          "type": "ColumnSet",
+          "spacing": "small",
+          "selectAction": {
+            "type": "Action.Execute",
+            "verb": "deviceManager",
+            "tooltip": "${serial.strings.deviceManager}"
+          },
+          "columns": [
+            {
+              "type": "Column",
+              "width": "28px",
+              "verticalContentAlignment": "center",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${serial.strings.deviceManagerIcon}",
+                  "size": "medium"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${serial.strings.deviceManager}",
+                  "weight": "bolder",
+                  "wrap": false
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "${serial.strings.deviceManagerHint}",
+                  "size": "small",
+                  "isSubtle": true,
+                  "spacing": "none",
+                  "wrap": false
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "verticalContentAlignment": "center",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "›",
+                  "isSubtle": true
+                }
+              ]
+            }
+          ]
         }
       ]
     }
   ]
 }
-

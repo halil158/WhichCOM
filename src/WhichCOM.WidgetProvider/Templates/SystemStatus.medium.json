@@ -4,19 +4,26 @@
   "version": "1.5",
   "body": [
     {
+      "type": "TextBlock",
+      "text": "${internet}",
+      "color": "${internetColor}",
+      "size": "small",
+      "weight": "bolder"
+    },
+    {
       "type": "ColumnSet",
       "$data": "${links}",
       "spacing": "small",
       "columns": [
         {
           "type": "Column",
-          "width": "auto",
+          "width": "28px",
           "verticalContentAlignment": "center",
           "items": [
             {
               "type": "TextBlock",
               "text": "${icon}",
-              "size": "large"
+              "size": "medium"
             }
           ]
         },
@@ -44,48 +51,47 @@
       ]
     },
     {
-      "type": "TextBlock",
-      "text": "${internet}",
-      "color": "${internetColor}",
-      "size": "small",
-      "weight": "bolder",
-      "spacing": "small"
-    },
-    {
-      "type": "ColumnSet",
-      "$data": "${audio}",
-      "spacing": "small",
-      "columns": [
+      "type": "Container",
+      "separator": true,
+      "spacing": "medium",
+      "items": [
         {
-          "type": "Column",
-          "width": "auto",
-          "verticalContentAlignment": "center",
-          "items": [
+          "type": "ColumnSet",
+          "$data": "${audio}",
+          "spacing": "small",
+          "columns": [
             {
-              "type": "TextBlock",
-              "text": "${icon}",
-              "size": "large"
-            }
-          ]
-        },
-        {
-          "type": "Column",
-          "width": "stretch",
-          "items": [
-            {
-              "type": "TextBlock",
-              "text": "${title}",
-              "weight": "bolder",
-              "wrap": false
+              "type": "Column",
+              "width": "28px",
+              "verticalContentAlignment": "center",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${icon}",
+                  "size": "medium"
+                }
+              ]
             },
             {
-              "type": "TextBlock",
-              "$when": "${hasDetail}",
-              "text": "${detail}",
-              "size": "small",
-              "isSubtle": true,
-              "spacing": "none",
-              "wrap": false
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${title}",
+                  "weight": "bolder",
+                  "wrap": false
+                },
+                {
+                  "type": "TextBlock",
+                  "$when": "${hasDetail}",
+                  "text": "${detail}",
+                  "size": "small",
+                  "isSubtle": true,
+                  "spacing": "none",
+                  "wrap": false
+                }
+              ]
             }
           ]
         }

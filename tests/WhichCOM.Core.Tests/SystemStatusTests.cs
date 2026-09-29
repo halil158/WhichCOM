@@ -257,9 +257,9 @@ public class SystemStatusTests
 
         Assert.Equal(
             [
+                "Internet access",
                 SystemStatusCard.EthernetIcon, "Ethernet", "1 Gbps · 192.0.2.11",
                 SystemStatusCard.WiFiIcon, "TestNetwork", "72% · 192.0.2.10",
-                "Internet access",
                 SystemStatusCard.OutputIcon, "Speakers (Test Audio)", "Output",
                 SystemStatusCard.InputIcon, "Microphone (Test Audio)", "Input",
             ],
@@ -279,16 +279,14 @@ public class SystemStatusTests
         Assert.DoesNotContain("${", card.ToJsonString(), StringComparison.Ordinal);
         Assert.Equal(
             [
+                "Internet access",
                 SystemStatusCard.EthernetIcon, "Ethernet", "1 Gbps · 192.0.2.11",
                 SystemStatusCard.WiFiIcon, "TestNetwork", "72% · 192.0.2.10",
-                "Internet access",
                 SystemStatusCard.OutputIcon, "Speakers (Test Audio)", "Output",
                 SystemStatusCard.InputIcon, "Microphone (Test Audio)", "Input",
-                "Serial ports",
-                "CH340",
-                "Copied",
-                "Sensor board",
-                "Device Manager",
+                SerialPortsCard.PortIcon, "COM3", "CH340", "Copied",
+                SerialPortsCard.PortIcon, "COM7", "Sensor board", "new",
+                SerialPortsCard.DeviceManagerIcon, "Device Manager", "Show all devices", "›",
             ],
             texts);
 
@@ -297,7 +295,6 @@ public class SystemStatusTests
         Assert.Contains("\"verb\":\"copy\",\"tooltip\":\"Copy\",\"data\":{\"port\":\"COM7\"}", json, StringComparison.Ordinal);
         Assert.Contains("\"verb\":\"deviceManager\"", json, StringComparison.Ordinal);
         Assert.DoesNotContain("ActionSet", json, StringComparison.Ordinal);
-        Assert.Contains("new", json, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -307,7 +304,12 @@ public class SystemStatusTests
 
         var texts = Texts(ExpandLarge(data));
 
-        Assert.Equal(["Serial ports", "No device connected", "Device Manager"], texts.TakeLast(3));
+        Assert.Equal(
+            [
+                SerialPortsCard.PortIcon, "No device connected",
+                SerialPortsCard.DeviceManagerIcon, "Device Manager", "Show all devices", "›",
+            ],
+            texts.TakeLast(6));
     }
 
     [Fact]
@@ -318,7 +320,9 @@ public class SystemStatusTests
         var data = SystemStatusCard.BuildData(Full, ports, English, TestPorts.Noon, TimeSpan.FromSeconds(120));
 
         Assert.Equal(SystemStatusCard.LargeCardPortCapacity, data["serial"]!["ports"]!.AsArray().Count);
-        Assert.Equal(["+4 more", "Device Manager"], Texts(ExpandLarge(data)).TakeLast(2));
+        var texts = Texts(ExpandLarge(data));
+        Assert.Equal("+4 more", texts[^5]);
+        Assert.Equal("Device Manager", texts[^3]);
     }
 
     private static JsonNode ExpandLarge(JsonObject data)

@@ -7,6 +7,7 @@
       "type": "Container",
       "$data": "${ports}",
       "style": "${rowStyle}",
+      "bleed": true,
       "spacing": "small",
       "selectAction": {
         "type": "Action.Execute",
@@ -25,23 +26,11 @@
               "width": "stretch",
               "items": [
                 {
-                  "type": "RichTextBlock",
-                  "inlines": [
-                    {
-                      "type": "TextRun",
-                      "text": "${port}",
-                      "size": "large",
-                      "weight": "bolder"
-                    },
-                    {
-                      "type": "TextRun",
-                      "$when": "${isNew}",
-                      "text": "  ${$root.strings.new}",
-                      "size": "small",
-                      "weight": "bolder",
-                      "color": "accent"
-                    }
-                  ]
+                  "type": "TextBlock",
+                  "text": "${port}",
+                  "size": "large",
+                  "weight": "bolder",
+                  "wrap": false
                 },
                 {
                   "type": "TextBlock",
@@ -72,13 +61,12 @@
             {
               "type": "Column",
               "width": "auto",
-              "verticalContentAlignment": "center",
               "items": [
                 {
                   "type": "TextBlock",
-                  "$when": "${isCopied}",
-                  "text": "${copiedText}",
-                  "color": "good",
+                  "$when": "${hasStatus}",
+                  "text": "${status}",
+                  "color": "${statusColor}",
                   "size": "small",
                   "weight": "bolder"
                 }
@@ -105,23 +93,48 @@
       "wrap": true
     },
     {
-      "type": "Container",
+      "type": "ColumnSet",
+      "separator": true,
       "spacing": "medium",
       "selectAction": {
         "type": "Action.Execute",
         "verb": "deviceManager",
         "tooltip": "${strings.deviceManager}"
       },
-      "items": [
+      "columns": [
         {
-          "type": "TextBlock",
-          "text": "${strings.deviceManager}",
-          "color": "accent",
-          "size": "small",
-          "weight": "bolder"
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "${strings.deviceManager}",
+              "weight": "bolder",
+              "wrap": false
+            },
+            {
+              "type": "TextBlock",
+              "text": "${strings.deviceManagerHint}",
+              "size": "small",
+              "isSubtle": true,
+              "spacing": "none",
+              "wrap": false
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "auto",
+          "verticalContentAlignment": "center",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "›",
+              "isSubtle": true
+            }
+          ]
         }
       ]
     }
   ]
 }
-

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>WhichCOM card preview</title>
+<script src="https://unpkg.com/adaptivecards@3.0.4/dist/adaptivecards.min.js"></script>
+<style>
+  /* Colors of this page imitate the widget board. The cards themselves only use theme colors. */
+  body { margin: 0; padding: 16px; font-family: "Segoe UI", sans-serif; background: #161b26; color: #ddd; }
+  body.light { background: #dfe6f1; color: #222; }
+  a { color: inherit; }
+  .bar { margin-bottom: 12px; font-size: 13px; line-height: 1.6; }
+  .grid { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; }
+  .widget { width: 300px; border-radius: 14px; background: #2c2c2c; overflow: hidden; position: relative; }
+  body.light .widget { background: #f7f7f7; }
+  .widget.small { height: 146px; }
+  .widget.medium { height: 304px; }
+  .widget.large { height: 470px; }
+  .head { height: 44px; display: flex; align-items: center; padding: 0 16px; font-size: 12px; opacity: .8; }
+  .body { padding: 0 0 16px 0; }
+  .body .ac-adaptiveCard { padding: 0 16px !important; background: transparent !important; }
+  .over { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: #e0443e; display: none; }
+  .widget.overflow .over { display: block; }
+  .ac-selectable:hover { background: rgba(128, 128, 128, .25); }
+</style>
+</head>
+<body>
+<div class="bar">
+  <b>WhichCOM card preview.</b> An approximation: the widget board uses its own fonts and spacing.
+  A red line at the bottom means the content is taller than the widget.<br>
+  Theme: <a href="?theme=dark">dark</a> · <a href="?theme=light">light</a>
+  &nbsp; Language: <a href="?language=en">en</a> · <a href="?language=tr">tr</a>
+</div>
+<div class="grid" id="grid"></div>
+<script>
+const cards = /*CARDS*/[];
+const params = new URLSearchParams(location.search);
+const light = params.get('theme') === 'light';
+const language = params.get('language') || 'en';
+if (light) document.body.classList.add('light');
+
+for (const link of document.querySelectorAll('.bar a')) {
+  const merged = new URLSearchParams(location.search);
+  for (const [key, value] of new URLSearchParams(link.getAttribute('href'))) merged.set(key, value);
+  link.href = '?' + merged;
+}
+
+const foreground = light ? '#1a1a1a' : '#ffffff';
+const subtle = light ? '#606060' : '#c8c8c8';
+const pair = (normal, faded) => ({ default: normal, subtle: faded });
+const colors = {
+  default: pair(foreground, subtle),
+  accent: pair(light ? '#005fb8' : '#60cdff', '#60cdff'),
+  good: pair(light ? '#0f7b0f' : '#6ccb5f', '#6ccb5f'),
+  attention: pair(light ? '#c42b1c' : '#ff99a4', '#ff99a4'),
+  warning: pair('#9d5d00', '#9d5d00'),
+  dark: pair('#000000', '#666666'),
+  light: pair('#ffffff', '#cccccc')
+};
+const hostConfig = new AdaptiveCards.HostConfig({
+  fontFamily: 'Segoe UI, sans-serif',
+  spacing: { small: 8, default: 12, medium: 16, large: 20, extraLarge: 24, padding: 16 },
+  separator: { lineThickness: 1, lineColor: light ? '#d0d0d0' : '#555555' },
+  fontSizes: { small: 12, default: 14, medium: 16, large: 20, extraLarge: 28 },
+  fontWeights: { lighter: 300, default: 400, bolder: 600 },
+  containerStyles: {
+    default: { backgroundColor: 'transparent', foregroundColors: colors },
+    emphasis: { backgroundColor: light ? '#ebebeb' : '#3a3a3a', foregroundColors: colors }
+  },
+  actions: { actionsOrientation: 'horizontal', actionAlignment: 'left', buttonSpacing: 8, maxActions: 5, spacing: 'default' }
+});
+
+for (const item of cards.filter(card => card.language === language)) {
+  const widget = document.createElement('div');
+  widget.className = 'widget ' + item.size;
+  widget.innerHTML = '<div class="head"></div><div class="body"></div><div class="over"></div>';
+
+  const card = new AdaptiveCards.AdaptiveCard();
+  card.hostConfig = hostConfig;
+  card.parse(item.card);
+  const element = card.render();
+  widget.querySelector('.body').appendChild(element);
+  document.getElementById('grid').appendChild(widget);
+
+  const used = Math.round(44 + element.getBoundingClientRect().height + 16);
+  widget.querySelector('.head').textContent = item.title + ' · ' + item.size + ' · ' + used + ' px';
+  if (used > widget.getBoundingClientRect().height) widget.classList.add('overflow');
+}
+</script>
+</body>
+</html>

@@ -10,6 +10,8 @@ public static partial class SerialPortsCard
     public const string CopyVerb = "copy";
     public const string DeviceManagerVerb = "deviceManager";
     public const string PortProperty = "port";
+    public const string PortIcon = "\U0001F50C";
+    public const string DeviceManagerIcon = "\U0001F6E0️";
 
     private const string Separator = " · ";
 
@@ -65,6 +67,7 @@ public static partial class SerialPortsCard
             ["hasPorts"] = ports.Count > 0,
             ["isEmpty"] = ports.Count == 0,
             ["summary"] = summary,
+            ["summarySize"] = visible.Count <= 2 ? "extraLarge" : "large",
             ["subtitle"] = BuildSubtitle(ports, strings),
             ["ports"] = rows,
             ["hasMore"] = hidden > 0,
@@ -75,6 +78,9 @@ public static partial class SerialPortsCard
                 ["noDevice"] = strings.NoDevice,
                 ["new"] = strings.New,
                 ["deviceManager"] = strings.DeviceManager,
+                ["deviceManagerHint"] = strings.DeviceManagerHint,
+                ["deviceManagerIcon"] = DeviceManagerIcon,
+                ["portIcon"] = PortIcon,
             },
         };
     }
@@ -136,9 +142,16 @@ public static partial class SerialPortsCard
         var detail = string.Join(Separator, parts.Where(part => !string.IsNullOrWhiteSpace(part)));
         var serial = port.SerialNumber is null ? string.Empty : $"{strings.SerialNumber} {port.SerialNumber}";
 
+        // One short text at the end of the row: the copy confirmation wins over the new mark.
+        var status = copied ? strings.Copied : isNew ? strings.New : string.Empty;
+
         return new JsonObject
         {
             [PortProperty] = port.PortName,
+            ["icon"] = PortIcon,
+            ["status"] = status,
+            ["statusColor"] = copied ? "good" : "accent",
+            ["hasStatus"] = status.Length > 0,
             ["label"] = port.DisplayLabel,
             ["detail"] = detail,
             ["hasDetail"] = detail.Length > 0,
@@ -148,8 +161,6 @@ public static partial class SerialPortsCard
             ["rowStyle"] = isNew ? "emphasis" : "default",
             // A click on the row copies the port name; the confirmation is shown for a moment.
             ["copyTitle"] = strings.Copy,
-            ["isCopied"] = copied,
-            ["copiedText"] = strings.Copied,
         };
     }
 

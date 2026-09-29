@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>WhichCOM.CardPreview</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <Description>Draws the widget cards with made-up data in a web page.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AdaptiveCards.Templating" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\WhichCOM.Core\WhichCOM.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="preview.html" LogicalName="preview.html" />
+  </ItemGroup>
+
+</Project>

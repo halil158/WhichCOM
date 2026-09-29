@@ -8,7 +8,7 @@ namespace WhichCOM.Core.Cards;
 public static class SystemStatusCard
 {
     public const string WiFiIcon = "\U0001F4F6";
-    public const string EthernetIcon = "\U0001F50C";
+    public const string EthernetIcon = "\U0001F310";
     public const string NoNetworkIcon = "⚠️";
     public const string OutputIcon = "\U0001F50A";
     public const string NoOutputIcon = "\U0001F507";

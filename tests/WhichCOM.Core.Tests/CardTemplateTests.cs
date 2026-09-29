@@ -86,7 +86,7 @@ public class CardTemplateTests
     {
         var card = ExpandSerialPorts(size, []);
 
-        Assert.Equal(["No device connected", "Device Manager"], Texts(card));
+        Assert.Equal(["No device connected", "Device Manager", "Show all devices", "›"], Texts(card));
         Assert.Single(Actions(card, SerialPortsCard.DeviceManagerVerb));
         Assert.Empty(Actions(card, SerialPortsCard.CopyVerb));
     }
@@ -116,16 +116,20 @@ public class CardTemplateTests
     [Theory]
     [InlineData(CardSize.Medium)]
     [InlineData(CardSize.Large)]
-    public void Only_the_new_port_has_the_new_badge(CardSize size)
+    public void Only_the_new_port_is_marked_as_new(CardSize size)
     {
-        var card = ExpandSerialPorts(size, Ports);
+        var texts = Texts(ExpandSerialPorts(size, Ports));
 
-        var runs = Descendants(card)
-            .Where(node => node["type"]?.GetValue<string>() == "TextRun")
-            .Select(node => node["text"]!.GetValue<string>().Trim())
-            .ToList();
+        Assert.Single(texts, text => text == "new");
+        Assert.True(texts.IndexOf("new") > texts.IndexOf("COM7"));
+    }
 
-        Assert.Equal(["COM3", "COM7", "new"], runs);
+    [Fact]
+    public void Medium_card_shows_port_and_label_in_every_row()
+    {
+        var texts = Texts(ExpandSerialPorts(CardSize.Medium, Ports));
+
+        Assert.Equal(["COM3", "CH340", "COM7", "Sensor board", "new"], texts);
     }
 
     [Theory]
@@ -151,7 +155,7 @@ public class CardTemplateTests
         Assert.Contains("USB-SERIAL CH340 · 1A86:7523", texts);
         Assert.Contains("ESP32 native USB · 303A:1001", texts);
         Assert.Contains("S/N AA:BB:CC:DD:EE:FF", texts);
-        Assert.Equal("Device Manager", texts[^1]);
+        Assert.Equal(["Device Manager", "Show all devices", "›"], texts.TakeLast(3));
 
         Assert.Single(Actions(card, SerialPortsCard.DeviceManagerVerb));
         Assert.Null(card["actions"]);

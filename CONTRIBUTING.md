@@ -88,7 +88,8 @@ explain why in the pull request.
 | `src/WhichCOM.Cli` | `comls` |
 | `src/WhichCOM.WidgetProvider` | COM server for the widget board, card templates, package manifest, images |
 | `tests/WhichCOM.Core.Tests` | Unit tests |
-| `scripts` | Certificate, package, install and scan scripts |
+| `tools/WhichCOM.CardPreview` | Draws the cards with example data in a web page |
+| `scripts` | Certificate, package, install, preview and scan scripts |
 
 ## Change a widget
 
@@ -100,10 +101,22 @@ A widget is drawn from two parts: a template and data.
 - Data is built in `src/WhichCOM.Core/Cards`. Texts are in `CardStrings.cs`, in English and
   Turkish; add new texts to both.
 
-The tests expand every template with real card data. After a change run `dotnet test`, then
-`./scripts/Register-DevPackage.ps1` and look at the widget in all its sizes.
+Design rules:
 
-Widgets cannot scroll. When you add rows, check the capacity constants in the card builders.
+- Every row looks the same: an icon, a bold title with a small subtle detail below, and at most
+  one short status text at the end.
+- Sections are divided by a separator line, not by headings.
+- No buttons in rows. A row that does something is clickable as a whole (`selectAction`).
+- Widgets cannot scroll and the large widget is only about 470 pixels high. When you add rows,
+  check the capacity constants in the card builders.
+
+To see a change:
+
+1. `./scripts/Preview-Cards.ps1` draws all cards with example data in the browser, in both
+   themes and languages. A red line marks a card that is taller than its widget.
+2. `dotnet test` expands every template with real card data.
+3. `./scripts/Register-DevPackage.ps1` puts the change on the widget board. The preview is an
+   approximation, so look at the real widget in all its sizes before you finish.
 
 ## Code
 

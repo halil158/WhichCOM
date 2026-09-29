@@ -88,6 +88,8 @@ public class SerialPortsCardTests
         Assert.Equal("default", rows[0]!["rowStyle"]!.GetValue<string>());
         Assert.True(rows[1]!["isNew"]!.GetValue<bool>());
         Assert.Equal("emphasis", rows[1]!["rowStyle"]!.GetValue<string>());
+        Assert.Equal("new", rows[1]!["status"]!.GetValue<string>());
+        Assert.Equal("accent", rows[1]!["statusColor"]!.GetValue<string>());
     }
 
     [Fact]
@@ -96,9 +98,9 @@ public class SerialPortsCardTests
         var rows = SerialPortsCard.BuildData(
             [TestPorts.Ch340(3), TestPorts.Esp32(7)], CardSize.Medium, English, Noon, Window, copiedPort: "COM7")["ports"]!.AsArray();
 
-        Assert.False(rows[0]!["isCopied"]!.GetValue<bool>());
-        Assert.True(rows[1]!["isCopied"]!.GetValue<bool>());
-        Assert.Equal("Copied", rows[1]!["copiedText"]!.GetValue<string>());
+        Assert.False(rows[0]!["hasStatus"]!.GetValue<bool>());
+        Assert.Equal("Copied", rows[1]!["status"]!.GetValue<string>());
+        Assert.Equal("good", rows[1]!["statusColor"]!.GetValue<string>());
     }
 
     [Theory]

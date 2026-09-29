@@ -31,6 +31,8 @@ public sealed record CardStrings
 
     public required string DeviceManager { get; init; }
 
+    public required string DeviceManagerHint { get; init; }
+
     /// <summary>Format string with the number of ports that did not fit on the card.</summary>
     public required string More { get; init; }
 
@@ -80,6 +82,7 @@ public sealed record CardStrings
         Latest = "Latest",
         SerialNumber = "S/N",
         DeviceManager = "Device Manager",
+        DeviceManagerHint = "Show all devices",
         More = "+{0} more",
         Internet = "Internet access",
         NoInternet = "No internet",
@@ -110,6 +113,7 @@ public sealed record CardStrings
         Latest = "Son takılan",
         SerialNumber = "Seri no",
         DeviceManager = "Aygıt Yöneticisi",
+        DeviceManagerHint = "Tüm cihazları göster",
         More = "+{0} port daha",
         Internet = "İnternet erişimi var",
         NoInternet = "İnternet yok",

@@ -7,7 +7,7 @@
       "type": "TextBlock",
       "$when": "${hasPorts}",
       "text": "${summary}",
-      "size": "extraLarge",
+      "size": "${summarySize}",
       "weight": "bolder",
       "wrap": true,
       "maxLines": 2
