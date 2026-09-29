@@ -60,6 +60,8 @@ public sealed record CardStrings
 
     public required string NoDeviceForNickname { get; init; }
 
+    public required string NicknameEnlarge { get; init; }
+
     public required string Save { get; init; }
 
     public required string Cancel { get; init; }
@@ -92,6 +94,7 @@ public sealed record CardStrings
         NicknameHint = "A nickname stays with the device, also when its port number changes.",
         NicknamePlaceholder = "Nickname",
         NoDeviceForNickname = "Connect a device to give it a nickname.",
+        NicknameEnlarge = "Make the widget larger to edit nicknames.",
         Save = "Save",
         Cancel = "Cancel",
     };
@@ -121,6 +124,7 @@ public sealed record CardStrings
         NicknameHint = "Takma ad cihaza bağlıdır; port numarası değişse de kalır.",
         NicknamePlaceholder = "Takma ad",
         NoDeviceForNickname = "Takma ad vermek için bir cihaz bağlayın.",
+        NicknameEnlarge = "Takma adları düzenlemek için widget'ı büyütün.",
         Save = "Kaydet",
         Cancel = "Vazgeç",
     };

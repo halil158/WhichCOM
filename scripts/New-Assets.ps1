@@ -131,7 +131,6 @@ function New-Theme([bool]$dark) {
             Subtle     = [System.Drawing.Color]::FromArgb(255, 170, 170, 170)
             Line       = [System.Drawing.Color]::FromArgb(255, 70, 70, 70)
             Accent     = [System.Drawing.Color]::FromArgb(255, 96, 165, 250)
-            OnAccent   = [System.Drawing.Color]::FromArgb(255, 20, 20, 20)
         }
     }
 
@@ -141,7 +140,6 @@ function New-Theme([bool]$dark) {
         Subtle     = [System.Drawing.Color]::FromArgb(255, 96, 96, 96)
         Line       = [System.Drawing.Color]::FromArgb(255, 224, 224, 224)
         Accent     = $accent
-        OnAccent   = [System.Drawing.Color]::White
     }
 }
 
@@ -161,15 +159,6 @@ function New-Screenshot([bool]$dark, [string]$path, [string]$title, [scriptblock
     Save-Png $bitmap $graphics $path
 }
 
-function Add-Button($graphics, $theme, [string]$text, [single]$right, [single]$y) {
-    # The widget board draws buttons filled with the accent color.
-    $width = 58
-    $shape = New-RoundedRectangle ($right - $width) $y $width 26 4
-    $brush = [System.Drawing.SolidBrush]::new($theme.Accent)
-    $graphics.FillPath($brush, $shape)
-    $brush.Dispose()
-    Add-Text $graphics $text ($right - $width + 13) ($y + 5) 12 $theme.OnAccent
-}
 
 $serialPorts = {
     param($graphics, $theme)
@@ -187,7 +176,6 @@ $serialPorts = {
         if ($row.New) {
             Add-Text $graphics 'new' 100 ($y + 9) 12 $theme.Accent -Bold
         }
-        Add-Button $graphics $theme 'Copy' 284 ($y + 12)
 
         $pen = [System.Drawing.Pen]::new($theme.Line, 1)
         $graphics.DrawLine($pen, 16, $y + 62, 284, $y + 62)

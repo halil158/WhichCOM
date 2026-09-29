@@ -96,14 +96,15 @@ public class SerialPortsCardTests
         var rows = SerialPortsCard.BuildData(
             [TestPorts.Ch340(3), TestPorts.Esp32(7)], CardSize.Medium, English, Noon, Window, copiedPort: "COM7")["ports"]!.AsArray();
 
-        Assert.Equal("Copy", rows[0]!["copyTitle"]!.GetValue<string>());
-        Assert.Equal("Copied", rows[1]!["copyTitle"]!.GetValue<string>());
+        Assert.False(rows[0]!["isCopied"]!.GetValue<bool>());
+        Assert.True(rows[1]!["isCopied"]!.GetValue<bool>());
+        Assert.Equal("Copied", rows[1]!["copiedText"]!.GetValue<string>());
     }
 
     [Theory]
     [InlineData(CardSize.Small, 4)]
     [InlineData(CardSize.Medium, 3)]
-    [InlineData(CardSize.Large, 5)]
+    [InlineData(CardSize.Large, 4)]
     public void Shows_no_more_ports_than_fit(CardSize size, int capacity)
     {
         var ports = Enumerable.Range(1, 8)

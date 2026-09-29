@@ -92,16 +92,16 @@
                         <Icon Path="ProviderAssets\SerialPorts_Icon.png" />
                       </Icons>
                       <Screenshots>
-                        <Screenshot Path="ProviderAssets\SerialPorts_Screenshot_Light.png" DisplayAltText="List of serial ports with chip type and a copy button" />
+                        <Screenshot Path="ProviderAssets\SerialPorts_Screenshot_Light.png" DisplayAltText="List of serial ports with chip type and nickname" />
                       </Screenshots>
                       <DarkMode>
                         <Screenshots>
-                          <Screenshot Path="ProviderAssets\SerialPorts_Screenshot_Dark.png" DisplayAltText="List of serial ports with chip type and a copy button" />
+                          <Screenshot Path="ProviderAssets\SerialPorts_Screenshot_Dark.png" DisplayAltText="List of serial ports with chip type and nickname" />
                         </Screenshots>
                       </DarkMode>
                       <LightMode>
                         <Screenshots>
-                          <Screenshot Path="ProviderAssets\SerialPorts_Screenshot_Light.png" DisplayAltText="List of serial ports with chip type and a copy button" />
+                          <Screenshot Path="ProviderAssets\SerialPorts_Screenshot_Light.png" DisplayAltText="List of serial ports with chip type and nickname" />
                         </Screenshots>
                       </LightMode>
                     </ThemeResources>

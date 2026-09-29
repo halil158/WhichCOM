@@ -21,7 +21,7 @@ public static partial class SerialPortsCard
     {
         CardSize.Small => 4,
         CardSize.Medium => 3,
-        _ => 5,
+        _ => 4,
     };
 
     public static JsonObject BuildData(
@@ -146,7 +146,10 @@ public static partial class SerialPortsCard
             ["hasSerial"] = serial.Length > 0,
             ["isNew"] = isNew,
             ["rowStyle"] = isNew ? "emphasis" : "default",
-            ["copyTitle"] = copied ? strings.Copied : strings.Copy,
+            // A click on the row copies the port name; the confirmation is shown for a moment.
+            ["copyTitle"] = strings.Copy,
+            ["isCopied"] = copied,
+            ["copiedText"] = strings.Copied,
         };
     }
 

@@ -18,8 +18,16 @@
 .PARAMETER Platform
     x64 or ARM64. Default: the architecture of this computer.
 
+.PARAMETER Reset
+    Removes the package and restarts the widget board before registering. Needed after a change
+    to a widget definition in the manifest (sizes, customization, names): the widget board keeps
+    the definition it saw first. Widgets have to be pinned again.
+
 .EXAMPLE
     ./scripts/Register-DevPackage.ps1
+
+.EXAMPLE
+    ./scripts/Register-DevPackage.ps1 -Reset
 #>
 [CmdletBinding()]
 param(
@@ -27,7 +35,9 @@ param(
     [string]$Configuration = 'Debug',
 
     [ValidateSet('x64', 'ARM64')]
-    [string]$Platform = $(if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') { 'ARM64' } else { 'x64' })
+    [string]$Platform = $(if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') { 'ARM64' } else { 'x64' }),
+
+    [switch]$Reset
 )
 
 $ErrorActionPreference = 'Stop'
@@ -66,9 +76,15 @@ Set-Content $layoutManifest $content -Encoding utf8
 
 # A signed installation cannot be replaced by a development registration.
 $installed = Get-AppxPackage -Name $script:PackageName
-if ($installed -and -not $installed.IsDevelopmentMode) {
+if ($installed -and ($Reset -or -not $installed.IsDevelopmentMode)) {
     Write-Host 'Removing the installed package. Widgets have to be pinned again.' -ForegroundColor Yellow
+    Stop-Provider
     $installed | Remove-AppxPackage
+}
+
+if ($Reset) {
+    Write-Host 'Restarting the widget board...'
+    Restart-WidgetHost
 }
 
 Write-Host "Registering version $version..."

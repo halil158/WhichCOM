@@ -286,13 +286,17 @@ public class SystemStatusTests
                 SystemStatusCard.InputIcon, "Microphone (Test Audio)", "Input",
                 "Serial ports",
                 "CH340",
+                "Copied",
                 "Sensor board",
+                "Device Manager",
             ],
             texts);
 
         var json = card.ToJsonString();
-        Assert.Contains("\"title\":\"Copied\",\"verb\":\"copy\",\"data\":{\"port\":\"COM3\"}", json, StringComparison.Ordinal);
-        Assert.Contains("\"title\":\"Copy\",\"verb\":\"copy\",\"data\":{\"port\":\"COM7\"}", json, StringComparison.Ordinal);
+        Assert.Contains("\"verb\":\"copy\",\"tooltip\":\"Copy\",\"data\":{\"port\":\"COM3\"}", json, StringComparison.Ordinal);
+        Assert.Contains("\"verb\":\"copy\",\"tooltip\":\"Copy\",\"data\":{\"port\":\"COM7\"}", json, StringComparison.Ordinal);
+        Assert.Contains("\"verb\":\"deviceManager\"", json, StringComparison.Ordinal);
+        Assert.DoesNotContain("ActionSet", json, StringComparison.Ordinal);
         Assert.Contains("new", json, StringComparison.Ordinal);
     }
 
@@ -303,7 +307,7 @@ public class SystemStatusTests
 
         var texts = Texts(ExpandLarge(data));
 
-        Assert.Equal(["Serial ports", "No device connected"], texts.TakeLast(2));
+        Assert.Equal(["Serial ports", "No device connected", "Device Manager"], texts.TakeLast(3));
     }
 
     [Fact]
@@ -314,7 +318,7 @@ public class SystemStatusTests
         var data = SystemStatusCard.BuildData(Full, ports, English, TestPorts.Noon, TimeSpan.FromSeconds(120));
 
         Assert.Equal(SystemStatusCard.LargeCardPortCapacity, data["serial"]!["ports"]!.AsArray().Count);
-        Assert.Equal("+3 more", Texts(ExpandLarge(data))[^1]);
+        Assert.Equal(["+4 more", "Device Manager"], Texts(ExpandLarge(data)).TakeLast(2));
     }
 
     private static JsonNode ExpandLarge(JsonObject data)

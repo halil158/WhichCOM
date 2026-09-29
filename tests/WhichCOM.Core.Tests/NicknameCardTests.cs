@@ -44,9 +44,9 @@ public class NicknameCardTests
     }
 
     [Theory]
-    [InlineData(CardSize.Small, "COM9")]
+    [InlineData(CardSize.Small, "")]
     [InlineData(CardSize.Medium, "COM8,COM9")]
-    [InlineData(CardSize.Large, "COM5,COM6,COM7,COM8,COM9")]
+    [InlineData(CardSize.Large, "COM6,COM7,COM8,COM9")]
     public void Shows_the_most_recently_plugged_devices_that_fit(CardSize size, string expected)
     {
         var ports = Enumerable.Range(3, 7)
@@ -56,6 +56,15 @@ public class NicknameCardTests
         var devices = NicknameCard.BuildData(ports, size, English)["devices"]!.AsArray();
 
         Assert.Equal(expected, string.Join(',', devices.Select(device => device!["port"]!.GetValue<string>())));
+    }
+
+    [Fact]
+    public void Small_card_asks_for_a_larger_widget()
+    {
+        var data = NicknameCard.BuildData([TestPorts.Esp32(7)], CardSize.Small, English);
+
+        Assert.True(data["isEmpty"]!.GetValue<bool>());
+        Assert.Equal("Make the widget larger to edit nicknames.", data["noDevices"]!.GetValue<string>());
     }
 
     [Fact]

@@ -19,9 +19,9 @@ public static class NicknameCard
     /// <summary>Number of devices the card of the given size has room for.</summary>
     public static int Capacity(CardSize size) => size switch
     {
-        CardSize.Small => 1,
+        CardSize.Small => 0,
         CardSize.Medium => 2,
-        _ => 5,
+        _ => 4,
     };
 
     public static JsonObject BuildData(IReadOnlyList<SerialPortInfo> ports, CardSize size, CardStrings strings)
@@ -47,6 +47,9 @@ public static class NicknameCard
             });
         }
 
+        // The small card has no room for an input.
+        var message = Capacity(size) == 0 ? strings.NicknameEnlarge : strings.NoDeviceForNickname;
+
         return new JsonObject
         {
             ["title"] = strings.Nicknames,
@@ -55,7 +58,7 @@ public static class NicknameCard
             ["devices"] = rows,
             ["hasDevices"] = rows.Count > 0,
             ["isEmpty"] = rows.Count == 0,
-            ["noDevices"] = strings.NoDeviceForNickname,
+            ["noDevices"] = message,
             ["save"] = strings.Save,
             ["cancel"] = strings.Cancel,
             ["maxLength"] = MaxNicknameLength,

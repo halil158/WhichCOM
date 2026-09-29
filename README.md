@@ -13,7 +13,7 @@ Open the widget board (<kbd>Win</kbd> + <kbd>W</kbd>) and see everything at a gl
 
 - **Serial Ports widget** (small / medium / large)
   - Lists connected COM ports with chip type detection
-  - One-click copy of the port name
+  - Click a port to copy its name to the clipboard
   - Marks the port you plugged in most recently
   - Nicknames for your boards (e.g. "Sensor board #2")
 - **System Status widget** (small / medium / large)
@@ -156,7 +156,7 @@ A nickname belongs to a device, not to a port number:
 
 To set nicknames, open the **…** menu of a widget and choose **Customize widget**. The card lists
 the connected devices; type a nickname and choose **Save**. An empty nickname removes it. The
-card has room for 1 (small), 2 (medium) or 5 (large) devices.
+card has room for 2 (medium) or 4 (large) devices; the small widget is too small for it.
 
 Nicknames can also be written into the settings file by hand.
 
@@ -189,6 +189,7 @@ additions, create `%LOCALAPPDATA%\WhichCOM\chips.json` with the same format as
 | | Make sure **Widgets** is enabled in **Settings > Personalization > Taskbar** and that the "Windows Web Experience Pack" is up to date in the Microsoft Store. |
 | The widget is pinned but stays empty or shows an error | Read `%LOCALAPPDATA%\WhichCOM\provider.log`. It records when the provider starts, when widgets are shown and hidden, and every failure. |
 | | Check that the provider runs while the board is open: `Get-Process WhichCOM.WidgetProvider`. |
+| A size or **Customize widget** is missing in the **…** menu after an update | The widget board keeps the widget definition it saw first. Run `./scripts/Register-DevPackage.ps1 -Reset`, or uninstall and install the package, then pin the widgets again. |
 | A widget disappeared from the board | The log says `DeleteWidget` when a widget was unpinned. Add it again with **Add widgets**. |
 | `Install-Package.ps1` says the signature is not trusted | Run `New-DevCert.ps1 -Trust` in an elevated PowerShell. |
 | Installation fails with `0x80073CFB` or "a package with the same identity is already installed" | Run `./scripts/Uninstall-Package.ps1`, then install again. |
@@ -203,7 +204,7 @@ additions, create `%LOCALAPPDATA%\WhichCOM\chips.json` with the same format as
   nickname then belongs to the USB socket, not to the adapter.
 - Device descriptions are shown in the display language of Windows.
 - A widget has a fixed height and cannot scroll. The Serial Ports widget shows up to 4 (small),
-  3 (medium) or 5 (large) ports, preferring recently plugged USB devices. `comls` lists all.
+  3 (medium) or 4 (large) ports, preferring recently plugged USB devices. `comls` lists all.
 - **Wi-Fi name and signal.** Windows treats the Wi-Fi network name as location data and asks for
   location access when an application reads it. WhichCOM does not do that by default. It shows
   the name of the network profile, which Windows creates from the network name, and the signal
@@ -253,7 +254,7 @@ görmenizi sağlar. Ayrıca Wi-Fi, Ethernet ve ses cihazı durumunu gösterir.
 
 **Widget'lar**
 
-- **Serial Ports:** bağlı COM portları, çip tipi, takma ad ve Kopyala düğmesi
+- **Serial Ports:** bağlı COM portları, çip tipi ve takma ad; porta tıklayınca adı panoya kopyalanır
 - **System Status:** ağ, internet ve varsayılan ses cihazları; büyük boyutta COM portları da görünür
 
 Widget'lar yalnızca pano açıkken veri toplar.

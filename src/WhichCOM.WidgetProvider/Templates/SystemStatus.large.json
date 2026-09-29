@@ -104,6 +104,14 @@
       "type": "ColumnSet",
       "$data": "${serial.ports}",
       "spacing": "small",
+      "selectAction": {
+        "type": "Action.Execute",
+        "verb": "copy",
+        "tooltip": "${copyTitle}",
+        "data": {
+          "port": "${port}"
+        }
+      },
       "columns": [
         {
           "type": "Column",
@@ -143,17 +151,12 @@
           "verticalContentAlignment": "center",
           "items": [
             {
-              "type": "ActionSet",
-              "actions": [
-                {
-                  "type": "Action.Execute",
-                  "title": "${copyTitle}",
-                  "verb": "copy",
-                  "data": {
-                    "port": "${port}"
-                  }
-                }
-              ]
+              "type": "TextBlock",
+              "$when": "${isCopied}",
+              "text": "${copiedText}",
+              "color": "good",
+              "size": "small",
+              "weight": "bolder"
             }
           ]
         }
@@ -174,6 +177,25 @@
       "isSubtle": true,
       "spacing": "small",
       "wrap": true
+    },
+    {
+      "type": "Container",
+      "spacing": "medium",
+      "selectAction": {
+        "type": "Action.Execute",
+        "verb": "deviceManager",
+        "tooltip": "${serial.strings.deviceManager}"
+      },
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "${serial.strings.deviceManager}",
+          "color": "accent",
+          "size": "small",
+          "weight": "bolder"
+        }
+      ]
     }
   ]
 }
+

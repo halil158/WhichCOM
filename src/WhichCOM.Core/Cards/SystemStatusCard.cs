@@ -15,7 +15,7 @@ public static class SystemStatusCard
     public const string InputIcon = "\U0001F3A4";
 
     /// <summary>Number of serial ports the large card has room for below the status rows.</summary>
-    public const int LargeCardPortCapacity = 4;
+    public const int LargeCardPortCapacity = 3;
 
     private const string Separator = " · ";
     private const int MaxLinks = 2;

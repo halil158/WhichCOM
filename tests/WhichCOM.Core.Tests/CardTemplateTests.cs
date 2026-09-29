@@ -73,31 +73,40 @@ public class CardTemplateTests
         Assert.Equal(["COM3 · COM7", "Latest: COM7 · Sensor board"], texts);
     }
 
-    [Theory]
-    [InlineData(CardSize.Small)]
-    [InlineData(CardSize.Medium)]
-    [InlineData(CardSize.Large)]
-    public void Empty_card_shows_only_the_empty_text(CardSize size)
+    [Fact]
+    public void Empty_small_card_shows_only_the_empty_text()
     {
-        var texts = Texts(ExpandSerialPorts(size, []));
-
-        Assert.Equal(["No device connected"], texts);
+        Assert.Equal(["No device connected"], Texts(ExpandSerialPorts(CardSize.Small, [])));
     }
 
     [Theory]
     [InlineData(CardSize.Medium)]
     [InlineData(CardSize.Large)]
-    public void Every_row_has_a_copy_button_with_its_port(CardSize size)
+    public void Empty_card_offers_the_device_manager(CardSize size)
+    {
+        var card = ExpandSerialPorts(size, []);
+
+        Assert.Equal(["No device connected", "Device Manager"], Texts(card));
+        Assert.Single(Actions(card, SerialPortsCard.DeviceManagerVerb));
+        Assert.Empty(Actions(card, SerialPortsCard.CopyVerb));
+    }
+
+    [Theory]
+    [InlineData(CardSize.Medium)]
+    [InlineData(CardSize.Large)]
+    public void A_click_on_a_row_copies_its_port(CardSize size)
     {
         var card = ExpandSerialPorts(size, Ports);
 
-        var copyActions = Descendants(card)
-            .Where(node => node["type"]?.GetValue<string>() == "Action.Execute"
-                && node["verb"]?.GetValue<string>() == SerialPortsCard.CopyVerb)
-            .ToList();
+        var copyActions = Actions(card, SerialPortsCard.CopyVerb);
 
         Assert.Equal(["COM3", "COM7"], copyActions.Select(action => action["data"]!["port"]!.GetValue<string>()));
-        Assert.All(copyActions, action => Assert.Equal("Copy", action["title"]!.GetValue<string>()));
+        Assert.All(copyActions, action => Assert.Equal("Copy", action["tooltip"]!.GetValue<string>()));
+
+        // The rows stay plain: no buttons and no copy label.
+        Assert.DoesNotContain(Descendants(card), node => node["type"]?.GetValue<string>() == "ActionSet");
+        Assert.DoesNotContain("Copy", Texts(card));
+        Assert.DoesNotContain("Copied", Texts(card));
 
         // The provider must be able to read back what the card sends.
         Assert.All(copyActions, action =>
@@ -119,8 +128,22 @@ public class CardTemplateTests
         Assert.Equal(["COM3", "COM7", "new"], runs);
     }
 
+    [Theory]
+    [InlineData(CardSize.Medium)]
+    [InlineData(CardSize.Large)]
+    public void Only_the_copied_row_shows_the_confirmation(CardSize size)
+    {
+        var data = SerialPortsCard.BuildData(Ports, size, CardStrings.For("en"), Noon, Window, copiedPort: "COM7");
+        var template = new AdaptiveCardTemplate(ReadTemplate($"SerialPorts.{size.ToString().ToLowerInvariant()}"));
+
+        var texts = Texts(JsonNode.Parse(template.Expand(data.ToJsonString()))!);
+
+        Assert.Single(texts, text => text == "Copied");
+        Assert.Equal("Copied", texts[texts.IndexOf("Sensor board") + (size == CardSize.Large ? 3 : 1)]);
+    }
+
     [Fact]
-    public void Large_card_shows_details_and_the_device_manager_button()
+    public void Large_card_shows_details_and_the_device_manager_link()
     {
         var card = ExpandSerialPorts(CardSize.Large, Ports);
         var texts = Texts(card);
@@ -128,13 +151,13 @@ public class CardTemplateTests
         Assert.Contains("USB-SERIAL CH340 · 1A86:7523", texts);
         Assert.Contains("ESP32 native USB · 303A:1001", texts);
         Assert.Contains("S/N AA:BB:CC:DD:EE:FF", texts);
+        Assert.Equal("Device Manager", texts[^1]);
 
-        var action = Assert.Single(card["actions"]!.AsArray())!;
-        Assert.Equal(SerialPortsCard.DeviceManagerVerb, action["verb"]!.GetValue<string>());
-        Assert.Equal("Device Manager", action["title"]!.GetValue<string>());
+        Assert.Single(Actions(card, SerialPortsCard.DeviceManagerVerb));
+        Assert.Null(card["actions"]);
 
         var styles = card["body"]!.AsArray()
-            .Where(node => node!["type"]!.GetValue<string>() == "Container")
+            .Where(node => node!["style"] is not null)
             .Select(node => node!["style"]!.GetValue<string>());
         Assert.Equal(["default", "emphasis"], styles);
     }
@@ -156,6 +179,12 @@ public class CardTemplateTests
 
         return JsonNode.Parse(template.Expand(data.ToJsonString()))!;
     }
+
+    private static List<JsonObject> Actions(JsonNode card, string verb) =>
+        Descendants(card)
+            .Where(node => node["type"]?.GetValue<string>() == "Action.Execute"
+                && node["verb"]?.GetValue<string>() == verb)
+            .ToList();
 
     private static List<string> Texts(JsonNode card) =>
         Descendants(card)

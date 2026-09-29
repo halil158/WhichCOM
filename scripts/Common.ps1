@@ -74,6 +74,12 @@ function Stop-Provider {
     Get-Process $script:ProviderProcess -ErrorAction SilentlyContinue | Stop-Process -Force
 }
 
+# The widget board starts again by itself when it is opened.
+function Restart-WidgetHost {
+    Get-Process 'Widgets', 'WidgetService' -ErrorAction SilentlyContinue | Stop-Process -Force
+    Start-Sleep -Seconds 2
+}
+
 function Show-InstalledPackage {
     $package = Get-AppxPackage -Name $script:PackageName
     if ($package) {

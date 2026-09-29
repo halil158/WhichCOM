@@ -8,6 +8,14 @@
       "$data": "${ports}",
       "style": "${rowStyle}",
       "spacing": "small",
+      "selectAction": {
+        "type": "Action.Execute",
+        "verb": "copy",
+        "tooltip": "${copyTitle}",
+        "data": {
+          "port": "${port}"
+        }
+      },
       "items": [
         {
           "type": "ColumnSet",
@@ -67,17 +75,12 @@
               "verticalContentAlignment": "center",
               "items": [
                 {
-                  "type": "ActionSet",
-                  "actions": [
-                    {
-                      "type": "Action.Execute",
-                      "title": "${copyTitle}",
-                      "verb": "copy",
-                      "data": {
-                        "port": "${port}"
-                      }
-                    }
-                  ]
+                  "type": "TextBlock",
+                  "$when": "${isCopied}",
+                  "text": "${copiedText}",
+                  "color": "good",
+                  "size": "small",
+                  "weight": "bolder"
                 }
               ]
             }
@@ -100,13 +103,25 @@
       "size": "medium",
       "isSubtle": true,
       "wrap": true
-    }
-  ],
-  "actions": [
+    },
     {
-      "type": "Action.Execute",
-      "title": "${strings.deviceManager}",
-      "verb": "deviceManager"
+      "type": "Container",
+      "spacing": "medium",
+      "selectAction": {
+        "type": "Action.Execute",
+        "verb": "deviceManager",
+        "tooltip": "${strings.deviceManager}"
+      },
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "${strings.deviceManager}",
+          "color": "accent",
+          "size": "small",
+          "weight": "bolder"
+        }
+      ]
     }
   ]
 }
+
