@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.22621.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.22000.0</TargetPlatformMinVersion>
+    <SupportedOSPlatformVersion>10.0.22000.0</SupportedOSPlatformVersion>
+    <RootNamespace>WhichCOM.WidgetProvider</RootNamespace>
+    <AssemblyName>WhichCOM.WidgetProvider</AssemblyName>
+    <Platforms>x64;ARM64</Platforms>
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == '' and '$(Platform)' == 'ARM64'">win-arm64</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x64</RuntimeIdentifier>
+    <Description>Windows 11 widget provider that shows serial ports and system status.</Description>
+  </PropertyGroup>
+
+  <!-- MSIX package. The build never signs; scripts/Build-Package.ps1 signs with a local certificate. -->
+  <PropertyGroup>
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <WindowsPackageType>MSIX</WindowsPackageType>
+    <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
+    <AppxBundle>Never</AppxBundle>
+    <GenerateAppInstallerFile>false</GenerateAppInstallerFile>
+    <AppxSymbolPackageEnabled>false</AppxSymbolPackageEnabled>
+    <!-- The package brings its own .NET and Windows App SDK files, so nothing else has to be installed. -->
+    <SelfContained>true</SelfContained>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK.Widgets" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WhichCOM.Core\WhichCOM.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\**\*.png" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="ProviderAssets\**\*.png" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Public\**" CopyToOutputDirectory="PreserveNewest" />
+    <EmbeddedResource Include="Templates\*.json" LogicalName="WhichCOM.WidgetProvider.Templates.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>

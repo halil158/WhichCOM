@@ -2,6 +2,9 @@
   <Folder Name="/src/">
     <Project Path="src/WhichCOM.Cli/WhichCOM.Cli.csproj" />
     <Project Path="src/WhichCOM.Core/WhichCOM.Core.csproj" />
+    <Project Path="src/WhichCOM.WidgetProvider/WhichCOM.WidgetProvider.csproj">
+      <Platform Project="x64" />
+    </Project>
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/WhichCOM.Core.Tests/WhichCOM.Core.Tests.csproj" />

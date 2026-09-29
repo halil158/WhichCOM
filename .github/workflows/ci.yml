@@ -28,6 +28,10 @@ jobs:
       - name: Test
         run: dotnet test WhichCOM.slnx --configuration Release --no-build
 
+      - name: Package (unsigned)
+        shell: pwsh
+        run: ./scripts/Build-Package.ps1 -NoSign -Platform x64
+
   secrets:
     name: Secret and personal data scan
     runs-on: ubuntu-latest

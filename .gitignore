@@ -450,6 +450,8 @@ FodyWeavers.xsd
 *.appxupload
 AppPackages/
 BundleArtifacts/
+artifacts/
+publish/
 
 # User specific files. Commit *.example.json files instead.
 settings.json

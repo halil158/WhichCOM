@@ -21,6 +21,7 @@
   <!-- Keep local checkout paths (which may contain a user name) out of binaries and PDBs. -->
   <PropertyGroup>
     <Deterministic>true</Deterministic>
+    <DebugType>embedded</DebugType>
     <PathMap>$(MSBuildThisFileDirectory)=/_/</PathMap>
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>

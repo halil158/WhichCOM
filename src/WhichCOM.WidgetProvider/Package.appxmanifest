@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
+  xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
+  xmlns:desktop6="http://schemas.microsoft.com/appx/manifest/desktop/windows10/6"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap uap3 com desktop6 rescap">
+
+  <Identity
+    Name="Yigisoft.WhichCOM"
+    Publisher="CN=Yigisoft"
+    Version="0.1.0.0" />
+
+  <Properties>
+    <DisplayName>WhichCOM</DisplayName>
+    <PublisherDisplayName>Yigisoft</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+    <!-- Settings are shared with the comls tool, so they must land in the real %LOCALAPPDATA%. -->
+    <desktop6:FileSystemWriteVirtualization>disabled</desktop6:FileSystemWriteVirtualization>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.22000.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="en-us" />
+  </Resources>
+
+  <Applications>
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="$targetentrypoint$">
+      <uap:VisualElements
+        DisplayName="WhichCOM"
+        Description="Serial ports and system status on the widget board"
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png"
+        AppListEntry="none" />
+
+      <Extensions>
+        <!-- The widget host starts the provider through this COM class. -->
+        <com:Extension Category="windows.comServer">
+          <com:ComServer>
+            <com:ExeServer
+              Executable="WhichCOM.WidgetProvider.exe"
+              Arguments="-RegisterProcessAsComServer"
+              DisplayName="WhichCOM widget provider">
+              <com:Class Id="8F416A1C-B8FB-4DCB-978E-CCA7E588E858" DisplayName="WhichCOM widget provider" />
+            </com:ExeServer>
+          </com:ComServer>
+        </com:Extension>
+
+        <uap3:Extension Category="windows.appExtension">
+          <uap3:AppExtension
+            Name="com.microsoft.windows.widgets"
+            DisplayName="WhichCOM"
+            Id="WhichCOM"
+            PublicFolder="Public">
+            <uap3:Properties>
+              <WidgetProvider>
+                <ProviderIcons>
+                  <Icon Path="Assets\StoreLogo.png" />
+                </ProviderIcons>
+                <Activation>
+                  <CreateInstance ClassId="8F416A1C-B8FB-4DCB-978E-CCA7E588E858" />
+                </Activation>
+                <Definitions>
+                  <Definition
+                    Id="WhichCOM_Hello"
+                    DisplayName="WhichCOM Hello"
+                    Description="Test widget that shows the provider is installed"
+                    AllowMultiple="false">
+                    <Capabilities>
+                      <Capability>
+                        <Size Name="small" />
+                      </Capability>
+                      <Capability>
+                        <Size Name="medium" />
+                      </Capability>
+                      <Capability>
+                        <Size Name="large" />
+                      </Capability>
+                    </Capabilities>
+                    <ThemeResources>
+                      <Icons>
+                        <Icon Path="ProviderAssets\SerialPorts_Icon.png" />
+                      </Icons>
+                      <Screenshots>
+                        <Screenshot Path="ProviderAssets\SerialPorts_Screenshot_Light.png" DisplayAltText="List of serial ports with chip type and a copy button" />
+                      </Screenshots>
+                      <DarkMode>
+                        <Screenshots>
+                          <Screenshot Path="ProviderAssets\SerialPorts_Screenshot_Dark.png" DisplayAltText="List of serial ports with chip type and a copy button" />
+                        </Screenshots>
+                      </DarkMode>
+                      <LightMode>
+                        <Screenshots>
+                          <Screenshot Path="ProviderAssets\SerialPorts_Screenshot_Light.png" DisplayAltText="List of serial ports with chip type and a copy button" />
+                        </Screenshots>
+                      </LightMode>
+                    </ThemeResources>
+                  </Definition>
+                </Definitions>
+              </WidgetProvider>
+            </uap3:Properties>
+          </uap3:AppExtension>
+        </uap3:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+    <rescap:Capability Name="unvirtualizedResources" />
+  </Capabilities>
+</Package>

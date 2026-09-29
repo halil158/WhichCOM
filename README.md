@@ -17,7 +17,7 @@ Open the widget board (<kbd>Win</kbd> + <kbd>W</kbd>) and see everything at a gl
 | --- | --- |
 | Shared port library (`WhichCOM.Core`) | ✅ Available |
 | `comls` command line tool | ✅ Available |
-| Widget provider, MSIX package, certificate script | ⏳ Planned |
+| Widget provider, MSIX package, certificate script | ✅ Available (test widget) |
 | "Serial Ports" widget | ⏳ Planned |
 | "System Status" widget | ⏳ Planned |
 | Nicknames from the widget's customize screen | ⏳ Planned |
@@ -120,8 +120,73 @@ additions, create `%LOCALAPPDATA%\WhichCOM\chips.json` with the same format as
 
 ## Install the widgets
 
-Not available yet. This section will describe how to create the signing certificate, install the
-package, add the widgets to the widget board and uninstall everything.
+> The package currently contains a test widget ("WhichCOM Hello"). The real widgets follow.
+
+All scripts are in the [scripts](scripts) folder and run in PowerShell 7 (`pwsh`). Turn on
+Developer Mode first: **Settings > System > For developers > Developer Mode**.
+
+### Quick: register without a certificate
+
+```powershell
+./scripts/Register-DevPackage.ps1
+```
+
+This builds the provider and registers it for your user. Nothing is signed and no certificate is
+needed. Run it again after every change; pinned widgets stay on the board.
+
+### Full: signed package
+
+1. Create your own signing certificate. It is stored in your Windows certificate store; the
+   private key cannot be exported and is never written to a file.
+
+   ```powershell
+   ./scripts/New-DevCert.ps1
+   ```
+
+2. Let Windows trust the certificate. This needs an **elevated** PowerShell and is done once.
+   An elevated PowerShell starts in the system folder, so use the full path of the script;
+   step 1 prints the exact command.
+
+   ```powershell
+   pwsh -File "<path to the repository>\scripts\New-DevCert.ps1" -Trust
+   ```
+
+3. Build, sign and install.
+
+   ```powershell
+   ./scripts/Build-Package.ps1
+   ./scripts/Install-Package.ps1
+   ```
+
+The package contains everything it needs, including .NET and the Windows App SDK files.
+
+### Add a widget to the board
+
+1. Open the widget board with <kbd>Win</kbd> + <kbd>W</kbd>.
+2. Choose **Add widgets** (the **+** button).
+3. Select **WhichCOM** in the list, pick a widget and choose **Pin**.
+4. Use the **…** menu of the widget to change its size or to unpin it.
+
+### Uninstall
+
+```powershell
+./scripts/Uninstall-Package.ps1                      # keeps your settings
+./scripts/Uninstall-Package.ps1 -RemoveSettings      # also deletes your nicknames
+./scripts/Uninstall-Package.ps1 -RemoveCertificate   # also deletes the certificate
+```
+
+### Troubleshooting
+
+| Problem | What to check |
+| --- | --- |
+| WhichCOM is missing in **Add widgets** | Close the board and open it again; the list is cached. If it is still missing, sign out and in again, or end the `Widgets` and `WidgetService` processes in Task Manager. |
+| | `Get-AppxPackage Yigisoft.WhichCOM` must list the package. If not, the installation failed. |
+| | Make sure **Widgets** is enabled in **Settings > Personalization > Taskbar** and that the "Windows Web Experience Pack" is up to date in the Microsoft Store. |
+| The widget is pinned but stays empty or shows an error | Read `%LOCALAPPDATA%\WhichCOM\provider.log`. It records when the provider starts and every failure. |
+| | Check that the provider runs while the board is open: `Get-Process WhichCOM.WidgetProvider`. |
+| `Install-Package.ps1` says the signature is not trusted | Run `./scripts/New-DevCert.ps1 -Trust` in an elevated PowerShell. |
+| Installation fails with `0x80073CFB` or "a package with the same identity is already installed" | Run `./scripts/Uninstall-Package.ps1`, then install again. |
+| The build fails with `PRI210 ... File move failed` | The widget host has a file of an older build open. Rename `resources.pri` in the build output folder, or end the `WidgetService` process, and build again. |
 
 ## Known limitations
 
